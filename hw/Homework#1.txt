@@ -1,0 +1,24 @@
+Homework #1
+---------------------------------------------------------------------
+2.71
+A. The code does not work correctly when the word is negative. & 0xFF only pulls out the target byte without its sign. The rest 24 bits are all incorrectly set to zero. 
+B.
+int xbyte(packed_t word, int bytenum)
+{
+    bytenum = 3 - bytenum;
+    int temp = word << (bytenum << 3);
+    int temp2 = temp >> 24;
+    return temp2;
+}
+---------------------------------------------------------------------
+2.82
+A. sometimes yield 0
+	When x is Tmin, -x is also Tmin due to overflow. If (x < y) is true, (-x > -y) must also be true in order for the expression to yield 1. However, there does not exist an integer y that is less than Tmin. Therefore, the expression yields 0 in this case.
+B. always yield 1
+	(x+y) << 4 is the same as (16*x + 16*y). If we move (y-x) to the right hand side, the expression becomes (16*x + 16*y) == (16*y +  16*x). If there is overflow, it would occur on both sides. Therefore the expression always yields 1.
+C. always yield 1
+	~x+~y+1 = (-x-1)+(-y) = -(x+y)-1 = ~(x+y)
+D. always yield 1
+	ux - uy = (unsigned)x - (unsigned)y = (unsigned)(x-y) = (unsigned) -(y-x) = -(unsigned)(y-x)
+E. always yield 1
+	x >> 2 will never cause overflow because the result is closer to 0, further from extremes after the shift. (x >> 2) << 2 loses the last two bits of original x because of the left shift. The left hand side could be 1, 2, or 3 less than x or equal to x, depending on the last two bits of the original value.

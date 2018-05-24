@@ -1,0 +1,48 @@
+VIM Basics:
+
+
+Press Esc to begin a command (eg. save, copy, quit, etc, etc.)
+
+
+
+Editting commands
+
+i            begin editting the file
+
+v            begin selecting a part of file
+   
+	-> c      cut
+   	
+	-> y      copy
+   
+	-> p      paste (after cursor)
+   
+	-> P      paste (before cursor)
+
+dd           cut the current line (can then use p or P to paste)
+ 
+u            undo
+
+
+
+Commands that start with a colon :
+
+:w           save
+
+:x           save and quit
+
+:q           quit (will trigger error if file hasn't been saved)
+
+:q!          quit without saving
+
+
+
+
+Finding a string within a file
+
+/[REGEX]     eg. /command    -> this searches for the string "command"
+   
+	-> n      go to next string found
+
+:noh         turn off the search highlighting until next search 
+

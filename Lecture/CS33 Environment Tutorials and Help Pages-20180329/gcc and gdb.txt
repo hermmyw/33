@@ -1,0 +1,142 @@
+***Compile with gcc***
+
+gcc -O1 example.c -o example 
+<--- -O1 is the option do a preliminary optimisation (reduce code size), -o specifies the output file name ("example" in this case)
+
+./example
+
+echo $?  
+<--- this outputs the returned value of example, should be = 9
+
+***Output assembly***
+gcc -S example.c
+vi example.s
+
+-OR-
+
+objdump -S --disassemble example > example.dump
+vi example.dump
+
+
+***Compile in gcc to enable debugging***
+You cannot really use the -Og option (probably gcc version too old? gcc --version says the version is 2010)
+
+gcc -g example.c -o exdebug
+
+***Start up gdb***
+
+gdb exdebug
+
+***Set it up so that we will see the next assembly instructions to be executed***
+
+(gdb) set disassemble-next-line on
+
+***Set a breakpoint at the "main" function***
+
+(gdb) b main
+
+***Break at line 6 in source code (note: empty lines DO matter! the line number is the ACTUAL line number in .c file)***
+
+(gdb) b 6
+
+***Break at assembly instruction at particular address***
+
+(gdb) b *0x0000000000400492
+Breakpoint 4 at 0x400492: file example.c, line 4.
+
+***Get info about breakpoints***
+
+(gdb) info b
+
+***Delete a breakpoint (here, delete the third breakpoint)***
+
+(gdb) delete 3
+
+***Run the program***
+
+(gdb) run 
+<--- if we have arguments, type them after the "run"
+
+Starting program: /w/class.1/cs/cs33/cs33t6/exdebug
+
+Breakpoint 1, main () at example.c:4
+4       int a = 2;
+=> 0x0000000000400491 <main+8>:  c7 45 f8 02 00 00 00   movl   $0x2,-0x8(%rbp)
+
+***Step into the next assembly instruction***
+(gdb) si
+5       int b = 1;
+=> 0x0000000000400498 <main+15>:         c7 45 fc 01 00 00 00   movl   $0x1,-0x4(%rbp)
+
+...
+
+***Step into next source code line***
+(gdb) s
+main () at example.c:7
+7       }
+=> 0x00000000004004ae <main+37>:         c9     leaveq
+   0x00000000004004af <main+38>:         c3     retq
+
+***Continue to next source code line in the current stack frame***
+
+(gdb) next
+
+***Looking at registers and memory***
+
+***Look at all the registers***
+
+(gdb) i r
+
+***Look at a particular register***
+
+(gdb) i r rsp
+
+***Look at place in memory (in this example, at address specified by rsp register)***
+
+(gdb) x/x $rsp
+
+***Look at current instruction***
+
+(gdb) x/i $rip
+=> 0x4004a7 <main+30>:  mov    %eax,%edi
+
+***Look at a variable (in this case, the variable "a")***
+
+(gdb) p a
+
+***Disassmble your functions***
+
+***Let's look at the disassembled "main" function***
+
+(gdb) disassemble
+Dump of assembler code for function main:
+   0x0000000000400489 <+0>:     push   %rbp
+   0x000000000040048a <+1>:     mov    %rsp,%rbp
+   0x000000000040048d <+4>:     sub    $0x10,%rsp
+=> 0x0000000000400491 <+8>:     movl   $0x2,-0x8(%rbp)
+   0x0000000000400498 <+15>:    movl   $0x1,-0x4(%rbp)
+   0x000000000040049f <+22>:    mov    -0x4(%rbp),%edx
+   0x00000000004004a2 <+25>:    mov    -0x8(%rbp),%eax
+   0x00000000004004a5 <+28>:    mov    %edx,%esi
+   0x00000000004004a7 <+30>:    mov    %eax,%edi
+   0x00000000004004a9 <+32>:    callq  0x400474 <foo>
+   0x00000000004004ae <+37>:    leaveq
+   0x00000000004004af <+38>:    retq
+End of assembler dump.
+
+
+***You can also disassemble other functions too!***
+
+(gdb) disassemble foo
+Dump of assembler code for function foo:
+   0x0000000000400474 <+0>:     push   %rbp
+   0x0000000000400475 <+1>:     mov    %rsp,%rbp
+   0x0000000000400478 <+4>:     mov    %edi,-0x4(%rbp)
+   0x000000000040047b <+7>:     mov    %esi,-0x8(%rbp)
+   0x000000000040047e <+10>:    mov    -0x4(%rbp),%eax
+   0x0000000000400481 <+13>:    shl    $0x2,%eax
+   0x0000000000400484 <+16>:    add    -0x8(%rbp),%eax
+   0x0000000000400487 <+19>:    leaveq
+   0x0000000000400488 <+20>:    retq
+End of assembler dump.
+
