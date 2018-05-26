@@ -1,0 +1,14 @@
+Hermmy Wang
+704978214
+
+Homework#3
+void transpose(int *dst, int* src, int dim)
+{
+    int i, j, bi, bj;
+    int block = /* block size */
+    for (i = 0; i < dim; i+=block)
+        for (j = 0; j < dim; j+=block)
+            for (bi = 0; bi < i + block; bi++)
+                for (bj = 0; bj < j + block; bj++)
+                    dst[bi*dim + bj] = src[bj*dim + bi];
+}
