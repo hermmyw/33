@@ -1,8 +1,15 @@
-Homework#3
+//Hermmy Wang
+//704978214
+
+//Homework#3
 void transpose(int *dst, int* src, int dim)
 {
-	int i, j;
-	for (i = 0; i < dim; i++)
-		for(j = 0; j < dim; j++)
-			dst[j*dim + i] = src[i*dim + j];
+    int i, j, bi, bj;
+    int block = /* block size */ 16;
+#pragma omp parallel for num_threads(20) firstprivate(block, dim) private(j, bi, bj)
+    for (i = 0; i < dim; i+=block)
+        for (j = 0; j < dim; j+=block)
+            for (bi = i; bi < i + block && bi < dim; bi++)
+                for (bj = j; bj < j + block && bj < dim; bj++)
+                    dst[bi*dim + bj] = src[bj*dim + bi];
 }

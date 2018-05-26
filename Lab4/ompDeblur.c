@@ -50,12 +50,15 @@ void OMP_GaussianBlur(double *u, double Ksigma, int stepCount)
 {
 	double lambda = (Ksigma * Ksigma) / (double)(2 * stepCount);
 	double nu = (1.0 + 2.0*lambda - sqrt(1.0 + 4.0*lambda))/(2.0*lambda);
-	int x, y, z, step;
+	int x, y, z, step, index;
 	double boundryScale = 1.0 / (1.0 - nu);
 	double postScale = pow(nu / lambda, (double)(3 * stepCount));
 
+	
+	{
 	for(step = 0; step < stepCount; step++)
 	{
+		#pragma omp parallel for private (z)
 		for(y = 0; y < yMax; y++)
 		{
 			for(z = 0; z < zMax; z++)
@@ -63,16 +66,20 @@ void OMP_GaussianBlur(double *u, double Ksigma, int stepCount)
 				u[Index(0, y, z)] *= boundryScale;
 			}
 		}
+	
 		for(x = 1; x < xMax; x++)
 		{
+			#pragma omp parallel for private (z)
 			for(y = 0; y < yMax; y++)
 			{
 				for( z = 0; z < zMax; z++)
 				{
-					u[Index(x, y, z)] += u[Index(x - 1, y, z)] * nu;
+					index = Index(x, y, z);
+					u[index] += u[index-1] * nu;
 				}
 			}
 		}
+		#pragma omp parallel for private (z)
 		for(y = 0; y < yMax; y++)
 		{
 			for(z = 0; z < zMax; z++)
@@ -80,16 +87,21 @@ void OMP_GaussianBlur(double *u, double Ksigma, int stepCount)
 				u[Index(0, y, z)] *= boundryScale;
 			}
 		}
+
 		for(x = xMax - 2; x >= 0; x--)
 		{
+			#pragma omp parallel for private (z)
 			for(y = 0; y < yMax; y++)
 			{
 				for(z = 0; z < zMax; z++)
 				{
-					u[Index(x, y, z)] += u[Index(x + 1, y, z)] * nu;
+					index = Index(x, y, z);
+					u[index] += u[index + 1] * nu;
 				}
 			}
 		}
+
+		#pragma omp parallel for private(z)
 		for(x = 0; x < xMax; x++)
 		{
 			for(z = 0; z < zMax; z++)
@@ -97,16 +109,21 @@ void OMP_GaussianBlur(double *u, double Ksigma, int stepCount)
 				u[Index(x, 0, z)] *= boundryScale;
 			}
 		}
+
+		#pragma omp parallel for private (z)
 		for(x = 0; x < xMax; x++)
 		{
 			for(y = 1; y < yMax; y++)
 			{
 				for(z = 0; z < zMax; z++)
 				{
-					u[Index(x, y, z)] += u[Index(x, y - 1, z)] * nu;
+					index = Index(x, y, z)
+					u[index] += u[index - xMax] * nu;
 				}
 			}
 		}
+
+		#pragma omp parallel for private (z)
 		for(x = 0; x < xMax; x++)
 		{
 			for(z = 0; z < zMax; z++)
@@ -114,13 +131,16 @@ void OMP_GaussianBlur(double *u, double Ksigma, int stepCount)
 				u[Index(x, yMax - 1, z)] *= boundryScale;
 			}
 		}
+
+		#pragma omp parallel for private (z)
 		for(x = 0; x < xMax; x++)
 		{
 			for(y = yMax - 2; y >= 0; y--)
 			{
 				for(z = 0; z < zMax; z++)
 				{
-					u[Index(x, y, z)] += u[Index(x, y + 1, z)] * nu;
+					index = Index(x, y, z)
+					u[index] += u[index + xMax] * nu;
 				}
 			}
 		}
@@ -158,6 +178,7 @@ void OMP_GaussianBlur(double *u, double Ksigma, int stepCount)
 				}
 			}
 		}
+	}
 	}
 	for(x = 0; x < xMax; x++)
 	{
