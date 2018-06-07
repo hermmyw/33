@@ -1,0 +1,210 @@
+#pragma omp parallel num_threads(T)
+{
+    #pragma omp for private(y,x,index,zy)
+    /* Space locality */
+    for(z = 0; z < zMax; z++)
+    {
+        /* Code motion */
+        zy = z*yxMax;
+        for(y = 0; y < yMax; y++)
+        {
+            u[zy] *= boundryScale;
+            for(x = 1; x < xMax; x++)
+            {
+                /* Reduce procedure calls */
+                index = zy+x;
+                u[index] += u[index-1] * nu;
+            }
+            u[zy] *= boundryScale;
+            for(x = xMax - 2; x >= 0; x--)
+            {
+                index = zy+x;
+                u[index] += u[index+1] * nu;
+            }
+            /* Strength reduction */
+            zy+=xMax;
+        }
+    }
+
+    edge = yxMax-xMax;
+    #pragma omp for private(z,x,y,index,zx)
+    for(z = 0; z < zMax; z++)
+    {
+        zx = z*yxMax;
+        for (x = 0; x < xMax; x++)
+        {
+            /* (z*xMax*yMax + y*xMax + x) */
+            u[zx] *= boundryScale;
+            for(y = 1; y < yMax; y++)
+            {
+                index = zx+y*xMax;
+                u[index] += u[index-xMax] * nu;
+            }
+            u[zx+edge] *= boundryScale;
+            for(y = yMax - 2; y >= 0; y--)
+            {
+                index = zx+y*xMax;
+                u[index] += u[index+xMax] * nu;
+            }
+            zx++;
+        }
+    }
+    
+    edge = zMax*yxMax-yxMax;
+    #pragma omp for private(y,x,z,index,yx)
+    for(y = 0; y < yMax; y++)
+    {
+        /* (z*xMax*yMax + y*xMax + x) */
+        yx = y*xMax;
+        for (x = 0; x < xMax; x++)
+        {
+            u[yx] *= boundryScale;
+            for(z = 1; z < zMax; z++)
+            {
+                index = yx+z*yxMax;;
+                u[index] = u[index-yxMax] * nu;
+            }
+            u[yx+edge] *= boundryScale;
+            for(z = zMax - 2; z >= 0; z--)
+            {
+                index = yx+z*yxMax;
+                u[index] += u[index+yxMax] * nu;
+            }
+            yx++;
+        }
+    }
+}
+
+/* Loop unrolling */
+#pragma omp parallel for num_threads(T) private(x,y,z,zy,index)
+for(z = 0; z < zMax; z++)
+{
+    zy = z*yxMax;
+    for (y = 0; y < yMax; y++)
+    {
+        for(x = 0; x < xMax; x+=4)
+        {
+            index = zy+x;
+            u[index++] *= postScale;
+            u[index++] *= postScale;
+            u[index++] *= postScale;
+            u[index] *= postScale;
+        }
+        zy+=xMax;
+    }
+}
+
+
+#pragma omp parallel for num_threads(N) private(z, y, x, index, tmp, zy)
+for(z = 1; z < zMax - 1; z++)
+{
+    zy = z*yxMax;
+    for (y = 1; y < yMax - 1; y++)
+    {
+        zy += xMax;
+        for(x = 1; x < xMax - 1; x+=2)
+        {
+
+            index = zy+x;
+            /* Memory aliasing */
+            tmp = u[index];
+            g[index] = 1.0 / sqrt(epsilon + 
+                SQR(tmp - u[index+1]) + 
+                SQR(tmp - u[index-1]) + 
+                SQR(tmp - u[index+xMax]) + 
+                SQR(tmp - u[index-xMax]) + 
+                SQR(tmp - u[index+xMax*yMax]) + 
+                SQR(tmp - u[index-xMax*yMax]));
+
+            index++;
+            tmp = u[index];
+            g[index] = 1.0 / sqrt(epsilon + 
+                SQR(tmp - u[index+1]) + 
+                SQR(tmp - u[index-1]) + 
+                SQR(tmp - u[index+xMax]) + 
+                SQR(tmp - u[index-xMax]) + 
+                SQR(tmp - u[index+xMax*yMax]) + 
+                SQR(tmp - u[index-xMax*yMax]));
+            
+        }
+    }
+}
+
+
+memcpy(conv, u, sizeof(double) * xMax * yMax * zMax);
+OMP_GaussianBlur(conv, Ksigma, 3);
+
+double r;
+#pragma omp parallel for num_threads(T) private(r,x,y,z,index,bx,by,bz)
+for(z = 0; z < zMax; z+=B)
+{
+    for(y = 0; y < yMax; y+=B)
+    {
+        for(x = 0; x < xMax; x+=B)
+        {
+            /* Blocking */
+            for (bz = z; (bz < z+B && bz < zMax); bz++)
+            {
+                for (by = y; (by < y+B && by < yMax); by++)
+                {
+                    for (bx = x; (bx < x+B && bx < xMax); bx+=2)
+                    {
+                        index = Index(bx, by, bz);
+                        r = conv[index] * f[index] / sigma2;
+                        r = (r * (2.38944 + r * (0.950037 + r))) / (4.65314 + r * (2.57541 + r * (1.48937 + r)));
+                        conv[index] -= f[index] * r;
+
+                        index++;
+                        r = conv[index] * f[index] / sigma2;
+                        r = (r * (2.38944 + r * (0.950037 + r))) / (4.65314 + r * (2.57541 + r * (1.48937 + r)));
+                        conv[index] -= f[index] * r;                                
+                    }
+                }
+            }
+        }
+    }
+}
+
+OMP_GaussianBlur(conv, Ksigma, 3);
+converged = 0;
+
+
+int center, front, back, left, right, up, down;
+for(z = 1; z < zMax - 1; z++)
+{
+    zy=z*yxMax;
+    for(y = 1; y < yMax - 1; y++)
+    {
+        zy+=xMax;
+        for(x = 1; x < xMax - 1; x++)
+        {
+            /* Share common expression */
+            center = zy+x;
+            front = center - 1;
+            back = center + 1;
+            left = center - xMax;
+            right = center + xMax;
+            up = center - yxMax;
+            down = center + yxMax;
+            double oldVal = u[center];
+            double newVal = (oldVal + dt * ( 
+                u[front] * g[front] + 
+                u[back] * g[back] + 
+                u[left] * g[left] + 
+                u[right] * g[right] + 
+                u[up] * g[up] + 
+                u[down] * g[down] - gamma * conv[center])) /
+                (1.0 + dt * (g[back] + g[front] + g[right] + g[left] + g[down] + g[up]));
+            if(fabs(oldVal - newVal) < epsilon)
+            {
+                converged++;
+            }
+            u[center] = newVal;
+        }
+    }
+}
+if(converged > lastConverged)
+{
+    printf("%d pixels have converged on iteration %d\n", converged, iteration);
+    lastConverged = converged;
+}

@@ -1,0 +1,16 @@
+Hermmy Wang
+704978214 
+
+Homework#4
+1. The value of i is: 7
+
+The loop is similar to this:
+int i;
+for (i = 0; ;i++)
+{
+	int* x = save + 4*i;   /* word size is 4, so save+4*i = &save[i/4] */
+	if (*x != 0)
+		break;
+}
+
+2. worst: e. j and y need to be the indice of outer loops to achieve least spatial locality.

