@@ -1,146 +1,55 @@
 log
-11:35
-separate loops
-0.58
-0.52
-0.63
-one loop
-0.59
-0.43
-0.53
-lower loop out
-0.27
-0.54
-0.33
-0.42
+
+1) 11.014939x
+2) 11.329939x
+3) 10.860413x
+4) 11.373549x
+5) 13.374001x
+6) 11.002702x
+7) 11.234068x
+8) 12.282373x
+9) 11.545870
+10) 12.435526x
+11) 16.299068x
+12) 11.880714x
+13) 11.928401x
+14) 12.020384x
+15) 
 
 
-Thread
+lnxsrv01:
+13.350533x
+12.628741x
+14.185231x
 
-Change index 
-xzy zxy xyz zyx     zyx
-<0.1
+lnxsrv03:
+14.218801x
+14.455197x
+14.310658x
 
-xzy xzy xyz zyx zyx zyx
-Sequential took 9.713208 time units
-OpenMP took 1.279384 time units
-This resulted in a 7.592097x speed-up
+lnxsrv04:
+12.959783x
+12.780706x
+12.912448x
 
+lnxsrv06:
+11.144723x
+11.044230x
+12.756934x
 
-./deblurTest compareresult
-1. 10.85x
-2. 8.77x
-3. 8.92x
-4. 9.44x
-5. 8.72x
-6. 10.55x
-7. 9.41x
-8. 10.44x
-9. 12.28x
-10. 10.92x
-11. 8.
+lnxsrv07:
+13.309242x
+13.222338x
+13.287575x
 
+lnxsrv09:
+12.020384x
+11.980114x
+11.879770x
 
-thread: 16 10
-1. 10.16x
-2. 12.94x
-3. 11.55x
+==========
 
-blocking 
-size 8
-1. 14.33
-2. 12.97
-3. 10.62
-4. 11.25
-5. 12.07
-6. 11.70
-7. 9.02
-8. 8.25
-9. 10.50
-10. 10.85
-11. 11.70
-12. 12.42
-size 16
-1. 11.79
-2. 9.52
-
-
-blocking two loops in Deblur:
-1. 9.37
-2. 12.22
-3. 10.73
-4. 11.41
-5. 12.10
-6. 11. 40
-7. 9.80
-8. 8.38
-
-
-
-
-blocking one loop from deblur and one loop from blur:
-1. 13.40x
-2. 18.32x
-3. 11.13x
-4. 12.62x
-5. 12.30x
-6. 12.03x
-7. 11.97x
-8. 11.02x
-9. 11.05x
-10.10.17x
-
-
-
-
-#pragma omp parallel for schedule(dynamic,1)
-for (int xy = 0; xy < x_max*y_max; ++xy) {
-    int x = xy / y_max;
-    int y = xy % y_max;
-    //parallelize this code here
-}
-
-3*3=9
-123 123 123
-6
-y=6/3=2
-x=6%3=0
-
-3*3*3=27
-123 123 123 | 123 123 123 |  127 129 123
-
-23
-(2,1,2) = 9
-20
-(2,0,2) = 7
-z=23/9=2    20/9=2
-y=23%9/3=1  (20%9)/3=0
-x=23%9%3=2    20%9%3=2
-x=23%3=2      20
-
-z y x
-2*4*3=24
-
-123 123 123 123 | 193 123 123 123
-
-13(1,0,1)
-z=13/12=1
-y=13%12/3=0
-x=13%1=1
-
-
-#pragma omp parallel for num_threads(T) private(x,y,z)
-for(zyx = 0; zyx < zMax*yMax*xMax; zyx++)
-{
-	z = zyx/(yMax*xMax);
-	y = zyx%(yMax*xMax)/xMax;
-	x = zyx%xMax;
-	u[Index(x, y, z)] *= postScale;
-}
-
-
-(z * yMax + y) * xMax + x)
-=z*yMax*xMax+y*xMax+x
-zy=z*yMax*xMax+y*Max
-
-
+lnxsrv08:
+10.495766x
+10.784907x
+9.036929x
